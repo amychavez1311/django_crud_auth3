@@ -81,31 +81,49 @@ class CVPDFGenerator:
                 return None, None
             
             content = None
-            
-            # Intentar descargar como archivo local primero
-            try:
-                # Si tiene atributo path, es archivo local
-                if hasattr(file_field, 'path'):
-                    file_path = file_field.path
-                    if os.path.exists(file_path):
-                        with open(file_path, 'rb') as f:
-                            content = f.read()
-            except (AttributeError, OSError):
-                pass
-            
-                # Usar Django's default_storage para leer el archivo
-                # Esto funciona automáticamente con cualquier backend (local, Azure, S3, etc.)
+
+            # Normalizar el nombre para evitar rutas absolutas (Windows/Linux)
+            original_name = str(file_field.name)
+            norm_name = original_name.replace('\\', '/').lstrip('/')
+
+            # Candidatos a probar con default_storage
+            candidates = []
+            candidates.append(norm_name)
+
+            # Si incluye unidad (p. ej. C:/...) o es absoluta, intentar recortar
+            if ':' in norm_name:
+                after_drive = norm_name.split(':', 1)[1].lstrip('/')
+                candidates.append(after_drive)
+
+            # Si contiene 'media/', probar desde ahí hacia delante
+            if 'media/' in norm_name:
+                after_media = norm_name.split('media/', 1)[1]
+                candidates.append(after_media)
+
+            # Fallback al nombre base
+            candidates.append(os.path.basename(norm_name))
+
+            # Intentar abrir con default_storage usando los candidatos
+            opened = False
+            last_err = None
+            for name in candidates:
                 try:
-                    with default_storage.open(file_field.name, 'rb') as f:
+                    with default_storage.open(name, 'rb') as f:
                         content = f.read()
+                        opened = True
+                        break
                 except Exception as e:
-                    print(f"Error leyendo archivo desde storage: {e}")
-                    return None, None
+                    last_err = e
+                    continue
+
+            if not opened:
+                print(f"Error leyendo archivo desde storage: {last_err}")
+                return None, None
             
             # Crear archivo temporal
             if content:
                 # Obtener extensión del archivo
-                _, ext = os.path.splitext(file_field.name)
+                _, ext = os.path.splitext(os.path.basename(norm_name))
                 temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=ext)
                 temp_path = temp_file.name
                 temp_file.write(content)
