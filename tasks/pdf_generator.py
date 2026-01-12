@@ -13,6 +13,8 @@ from datetime import datetime
 from io import BytesIO
 import os
 from PyPDF2 import PdfMerger, PdfReader, PdfWriter
+import tempfile
+import urllib.request
 
 
 class CVPDFGenerator:
@@ -24,6 +26,7 @@ class CVPDFGenerator:
         self.story = []
         self.styles = getSampleStyleSheet()
         self.certificados_para_incrustar = []  # Lista de PDFs a incrustar
+        self.temp_files = []  # Lista de archivos temporales para limpiar
         self._create_custom_styles()
     
     def _create_custom_styles(self):
@@ -68,12 +71,32 @@ class CVPDFGenerator:
         # Agregar imagen de perfil si existe
         if self.datos.fotoperfil:
             try:
-                foto_path = self.datos.fotoperfil.path
-                if os.path.exists(foto_path):
-                    img = Image(foto_path, width=1.2*inch, height=1.2*inch)
-                    left_col.append(img)
-            except:
-                pass
+                # Intentar usar .path primero (para archivos locales)
+                try:
+                    foto_path = self.datos.fotoperfil.path
+                    if os.path.exists(foto_path):
+                        img = Image(foto_path, width=1.2*inch, height=1.2*inch)
+                        left_col.append(img)
+                except (AttributeError, TypeError):
+                    # Si .path no funciona, usar .url (para Azure Storage)
+                    foto_url = self.datos.fotoperfil.url
+                    if foto_url:
+                        # Descargar imagen temporalmente de Azure
+                        temp_fd, temp_path = tempfile.mkstemp(suffix='.jpg')
+                        try:
+                            urllib.request.urlretrieve(foto_url, temp_path)
+                            img = Image(temp_path, width=1.2*inch, height=1.2*inch)
+                            left_col.append(img)
+                            # Guardar ruta temporal para limpiar después
+                            if not hasattr(self, 'temp_files'):
+                                self.temp_files = []
+                            self.temp_files.append(temp_path)
+                        except Exception as e:
+                            print(f"Error descargando imagen de Azure: {e}")
+                            os.close(temp_fd)
+                            os.unlink(temp_path)
+            except Exception as e:
+                print(f"Error cargando foto de perfil: {e}")
         
         # Derecha: Nombre y datos de contacto
         right_col = []
@@ -378,12 +401,29 @@ class CVPDFGenerator:
                 pdf_buffer.seek(0)
                 pdf_buffer = self._incrustar_certificados(pdf_buffer)
             
+            # Limpiar archivos temporales (imágenes descargadas de Azure)
+            if hasattr(self, 'temp_files'):
+                for temp_file in self.temp_files:
+                    try:
+                        if os.path.exists(temp_file):
+                            os.remove(temp_file)
+                    except:
+                        pass
+            
             # Retornar al inicio del buffer
             pdf_buffer.seek(0)
             return pdf_buffer
         
         except Exception as e:
             print(f"Error generando PDF: {e}")
+            # Limpiar temporales en caso de error
+            if hasattr(self, 'temp_files'):
+                for temp_file in self.temp_files:
+                    try:
+                        if os.path.exists(temp_file):
+                            os.remove(temp_file)
+                    except:
+                        pass
             return None
     
     def _incrustar_certificados(self, pdf_principal_buffer):
