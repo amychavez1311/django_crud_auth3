@@ -93,11 +93,11 @@ class CVPDFGenerator:
             except (AttributeError, OSError):
                 pass
             
-            # Si no se obtuvo como local, intentar desde storage (Azure)
-            if content is None:
+                # Usar Django's default_storage para leer el archivo
+                # Esto funciona automáticamente con cualquier backend (local, Azure, S3, etc.)
                 try:
-                    # Usar Django's storage API (funciona con cualquier backend)
-                    content = file_field.read()
+                    with default_storage.open(file_field.name, 'rb') as f:
+                        content = f.read()
                 except Exception as e:
                     print(f"Error leyendo archivo desde storage: {e}")
                     return None, None
