@@ -195,6 +195,41 @@ Una vez desplegado, necesitas crear un superusuario:
 
 ## 🔍 Troubleshooting (Solución de Problemas)
 
+### 🖼️ Problema: Las imágenes de perfil no aparecen en el PDF generado
+
+**Causa:** En Azure Storage, los archivos no tienen una ruta local (`.path`). Solo tienen una URL (`.url`).
+
+**Solución (Ya Implementada):**
+- El `CVPDFGenerator` ahora descarga las imágenes temporalmente desde Azure
+- Usa `urllib.request.urlretrieve()` para descargar desde la URL de Azure
+- Crea archivos temporales con `tempfile`
+- Los archivos temporales se eliminan automáticamente después de generar el PDF
+
+**Cómo funciona:**
+```python
+# En _add_header()
+cert_url = imagen.url  # Obtener URL de Azure
+urllib.request.urlretrieve(cert_url, temp_path)  # Descargar a archivo temporal
+# Usar temp_path en ReportLab para insertar en PDF
+os.remove(temp_path)  # Limpiar temporal
+```
+
+### 📄 Problema: Los certificados (PDFs) no se incrustan en el CV
+
+**Causa:** Similar al anterior - no se puede acceder a `.path` en Azure Storage.
+
+**Solución (Ya Implementada):**
+- El método `_incrustar_certificados()` ahora:
+  1. Detecta si es una URL (Azure) o ruta local
+  2. Si es URL, descarga el PDF temporalmente
+  3. Usa PyPDF2 para mergear el PDF
+  4. Limpia el archivo temporal
+
+**Verificar en Logs de Render:**
+```
+Certificado incrustado: Curso: Python Avanzado
+```
+
 ### Problema: Error al subir certificados
 
 **Solución:**
