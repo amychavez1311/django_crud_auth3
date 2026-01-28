@@ -125,6 +125,17 @@ class DatosPersonalesForm(forms.ModelForm):
 
 class ExperienciaLaboralForm(forms.ModelForm):
     """Formulario para experiencia laboral"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            today_iso = date.today().isoformat()
+            # evitar que la fecha de fin supere el día actual
+            if 'fechafingestion' in self.fields:
+                self.fields['fechafingestion'].widget.attrs['max'] = today_iso
+            if 'fechainiciogestion' in self.fields:
+                self.fields['fechainiciogestion'].widget.attrs['max'] = today_iso
+        except Exception:
+            pass
     
     class Meta:
         model = ExperienciaLaboral
@@ -188,6 +199,18 @@ class ExperienciaLaboralForm(forms.ModelForm):
             }),
         }
 
+    def clean(self):
+        cleaned = super().clean()
+        inicio = cleaned.get('fechainiciogestion')
+        fin = cleaned.get('fechafingestion')
+        if inicio and fin:
+            if fin < inicio:
+                self.add_error('fechafingestion', 'La fecha de fin no puede ser anterior a la fecha de inicio.')
+        if fin:
+            if fin > date.today():
+                self.add_error('fechafingestion', 'La fecha de fin no puede ser posterior al día de hoy.')
+        return cleaned
+
 
 class ReconocimientoForm(forms.ModelForm):
     """Formulario para reconocimientos"""
@@ -239,6 +262,20 @@ class ReconocimientoForm(forms.ModelForm):
 
 class CursoRealizadoForm(forms.ModelForm):
     """Formulario para cursos realizados"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            today_iso = date.today().isoformat()
+            if 'fechafin' in self.fields:
+                self.fields['fechafin'].widget.attrs['max'] = today_iso
+            if 'fechainicio' in self.fields:
+                self.fields['fechainicio'].widget.attrs['max'] = today_iso
+            # si la instancia tiene datospersonales con fechanacimiento, establecer min en fechainicio
+            dp = getattr(self.instance, 'datospersonales', None)
+            if dp and getattr(dp, 'fechanacimiento', None):
+                self.fields['fechainicio'].widget.attrs['min'] = dp.fechanacimiento.isoformat()
+        except Exception:
+            pass
     
     class Meta:
         model = CursoRealizado
@@ -297,6 +334,25 @@ class CursoRealizadoForm(forms.ModelForm):
                 'class': 'form-check-input'
             }),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        inicio = cleaned.get('fechainicio')
+        fin = cleaned.get('fechafin')
+        # verificar coherencia inicio/fin
+        if inicio and fin:
+            if fin < inicio:
+                self.add_error('fechafin', 'La fecha de fin no puede ser anterior a la fecha de inicio.')
+        # fin no puede superar hoy
+        if fin:
+            if fin > date.today():
+                self.add_error('fechafin', 'La fecha de fin no puede ser posterior al día de hoy.')
+        # inicio no puede ser anterior a la fecha de nacimiento asociada
+        dp = getattr(self.instance, 'datospersonales', None)
+        if dp and getattr(dp, 'fechanacimiento', None) and inicio:
+            if inicio < dp.fechanacimiento:
+                self.add_error('fechainicio', 'La fecha de inicio no puede ser anterior a la fecha de nacimiento.')
+        return cleaned
 
 
 class ProductoAcademicoForm(forms.ModelForm):
