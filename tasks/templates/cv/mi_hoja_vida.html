@@ -128,10 +128,13 @@
             <div class="col-lg-9">
                 <!-- Header Actions -->
                 <div class="mb-4 d-flex gap-2 justify-content-end">
-                    <a href="{% url 'visualizar_cv_pdf' %}" class="btn btn-sm rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;" target="_blank">
+                    <a href="{% url 'visualizar_cv_pdf' %}" class="btn btn-sm btn-primary rounded-3" style="padding:0.45rem 0.9rem;" target="_blank">
                         <i class="bi bi-eye me-1"></i>Ver PDF
                     </a>
-                    <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-sm rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                    <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-outline-soft rounded-3" style="padding:0.45rem 0.9rem;">
+                        <i class="bi bi-pencil-square me-1"></i>Editar Perfil
+                    </a>
+                    <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-sm btn-outline-soft rounded-3" style="padding:0.45rem 0.9rem;">
                         <i class="bi bi-download me-1"></i>Descargar PDF
                     </a>
                 </div>
@@ -336,9 +339,7 @@
                             <h5 class="fw-bold text-dark mb-0">
                                 <i class="bi bi-files-alt me-2" style="color: #667eea;"></i>PRODUCTOS ACADÉMICOS
                             </h5>
-                            <a href="{% url 'crear_producto_academico' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
+                                <p class="muted-link">(Agregar productos académicos deshabilitado)</p>
                         </div>
                     </div>
                     <div class="card-body">
