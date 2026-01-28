@@ -196,7 +196,7 @@ class ReconocimientoForm(forms.ModelForm):
         model = Reconocimiento
         fields = [
             'tiporeconocimiento', 'fechareconocimiento', 'descripcionreconocimiento',
-            'entidadpatrocinadora', 'nombrecontactoauspicia', 'telefonocontactoauspicia',
+            'entidad patrocinadora', 'nombrecontactoauspicia', 'telefonocontactoauspicia',
             'certificado', 'activo'
         ]
         widgets = {
@@ -214,7 +214,7 @@ class ReconocimientoForm(forms.ModelForm):
                 'placeholder': 'Descripción del Reconocimiento',
                 'rows': 3
             }),
-            'entidadpatrocinadora': forms.TextInput(attrs={
+            'entidad patrocinadora': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Entidad Patrocinadora',
                 'required': 'required'
