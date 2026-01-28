@@ -214,6 +214,14 @@ class ExperienciaLaboralForm(forms.ModelForm):
 
 class ReconocimientoForm(forms.ModelForm):
     """Formulario para reconocimientos"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            today_iso = date.today().isoformat()
+            if 'fechareconocimiento' in self.fields:
+                self.fields['fechareconocimiento'].widget.attrs['max'] = today_iso
+        except Exception:
+            pass
     
     class Meta:
         model = Reconocimiento
@@ -258,6 +266,12 @@ class ReconocimientoForm(forms.ModelForm):
                 'class': 'form-check-input'
             }),
         }
+
+    def clean_fechareconocimiento(self):
+        fechareconocimiento = self.cleaned_data.get('fechareconocimiento')
+        if fechareconocimiento and fechareconocimiento > date.today():
+            raise forms.ValidationError('La fecha del reconocimiento no puede ser posterior al día de hoy.')
+        return fechareconocimiento
 
 
 class CursoRealizadoForm(forms.ModelForm):
@@ -385,6 +399,14 @@ class ProductoAcademicoForm(forms.ModelForm):
 
 class ProductoLaboralForm(forms.ModelForm):
     """Formulario para productos laborales"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            today_iso = date.today().isoformat()
+            if 'fechaproducto' in self.fields:
+                self.fields['fechaproducto'].widget.attrs['max'] = today_iso
+        except Exception:
+            pass
     
     class Meta:
         model = ProductoLaboral
@@ -409,6 +431,12 @@ class ProductoLaboralForm(forms.ModelForm):
                 'class': 'form-check-input'
             }),
         }
+
+    def clean_fechaproducto(self):
+        fechaproducto = self.cleaned_data.get('fechaproducto')
+        if fechaproducto and fechaproducto > date.today():
+            raise forms.ValidationError('La fecha del producto no puede ser posterior al día de hoy.')
+        return fechaproducto
 
 
 class VentaGarageForm(forms.ModelForm):
