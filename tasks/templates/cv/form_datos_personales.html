@@ -129,47 +129,8 @@
                                             {% for error in form.telefonoconvencional.errors %}{{ error }}{% endfor %}
                                         </div>
                                     {% endif %}
+                                    <small class="form-text text-muted">Ingrese hasta 15 dígitos (solo números).</small>
                                 </div>
-                                <script>
-                                    (function(){
-                                        const select = document.getElementById('id_telefonoconvencional_0');
-                                        if (!select) return;
-                                        // store original full labels in data-country and collapse to prefix-only
-                                        for (const opt of select.options) {
-                                            const text = opt.textContent.trim();
-                                            const parts = text.split(' ');
-                                            if (parts.length > 1) {
-                                                const prefix = parts[0];
-                                                const country = parts.slice(1).join(' ');
-                                                opt.dataset.country = country;
-                                                opt.textContent = prefix;
-                                            } else {
-                                                opt.dataset.country = '';
-                                            }
-                                        }
-
-                                        function expandOptions(){
-                                            for (const opt of select.options) {
-                                                const prefix = opt.textContent.trim();
-                                                if (opt.dataset.country) {
-                                                    opt.textContent = prefix + ' ' + opt.dataset.country;
-                                                }
-                                            }
-                                        }
-                                        function collapseOptions(){
-                                            for (const opt of select.options) {
-                                                const txt = opt.textContent.trim();
-                                                const m = txt.match(/^(\+\d+)/);
-                                                if (m) opt.textContent = m[0];
-                                            }
-                                        }
-
-                                        select.addEventListener('focus', expandOptions);
-                                        select.addEventListener('mousedown', expandOptions);
-                                        select.addEventListener('blur', collapseOptions);
-                                        select.addEventListener('change', collapseOptions);
-                                    })();
-                                </script>
                             </div>
                             <!-- Teléfono Fijo -->
                             <div class="col-md-6">
