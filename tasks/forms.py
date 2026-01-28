@@ -1,6 +1,5 @@
 from django import forms
-from django.core.exceptions import ValidationError
-from datetime import date
+from datetime import date, timedelta
 from .models import (
     Task, DatosPersonales, ExperienciaLaboral, Reconocimiento,
     CursoRealizado, ProductoAcademico, ProductoLaboral, VentaGarage
@@ -26,12 +25,17 @@ class TaskForm(forms.ModelForm):
 
 class DatosPersonalesForm(forms.ModelForm):
     """Formulario para datos personales"""
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Set max attribute on date inputs so UI cannot select future dates
-        if 'fechanacimiento' in self.fields:
-            self.fields['fechanacimiento'].widget.attrs.setdefault('max', date.today().isoformat())
-
+        # asegurar que el date input solo permita fechas anteriores a hoy
+        try:
+            yesterday = date.today() - timedelta(days=1)
+            if 'fechanacimiento' in self.fields:
+                self.fields['fechanacimiento'].widget.attrs['max'] = yesterday.isoformat()
+        except Exception:
+            pass
+    
     class Meta:
         model = DatosPersonales
         fields = [
@@ -80,9 +84,7 @@ class DatosPersonalesForm(forms.ModelForm):
             }),
             'telefonoconvencional': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Teléfono convencional',
-                'maxlength': '15',
-                'inputmode': 'numeric'
+                'placeholder': 'Teléfono Convencional'
             }),
             'telefonofijo': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -115,19 +117,10 @@ class DatosPersonalesForm(forms.ModelForm):
 
     def clean_fechanacimiento(self):
         fechanacimiento = self.cleaned_data.get('fechanacimiento')
-        if fechanacimiento and fechanacimiento > date.today():
-            raise ValidationError('La fecha de nacimiento no puede ser posterior al día de hoy.')
+        if fechanacimiento:
+            if fechanacimiento >= date.today():
+                raise forms.ValidationError('La fecha de nacimiento debe ser anterior a hoy.')
         return fechanacimiento
-
-    def clean_telefonoconvencional(self):
-        val = self.cleaned_data.get('telefonoconvencional')
-        if not val:
-            return val
-        # Strip non-digits
-        digits = ''.join(ch for ch in str(val) if ch.isdigit())
-        if len(digits) > 15:
-            raise ValidationError('El número no puede tener más de 15 dígitos.')
-        return digits
 
 
 class ExperienciaLaboralForm(forms.ModelForm):

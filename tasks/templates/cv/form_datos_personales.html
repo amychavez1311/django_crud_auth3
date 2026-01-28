@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header card-header-custom">
                     <h3 class="mb-0">Crear/Editar Datos Personales</h3>
                 </div>
                 <div class="card-body">
@@ -85,11 +85,6 @@
                                 <div class="mb-3">
                                     <label for="id_fechanacimiento" class="form-label">Fecha de Nacimiento</label>
                                     {{ form.fechanacimiento }}
-                                    {% if form.fechanacimiento.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in form.fechanacimiento.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
                                 </div>
                             </div>
                             <!-- Nacionalidad -->
@@ -124,12 +119,6 @@
                                 <div class="mb-3">
                                     <label for="id_telefonoconvencional" class="form-label">Teléfono Convencional</label>
                                     {{ form.telefonoconvencional }}
-                                    {% if form.telefonoconvencional.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in form.telefonoconvencional.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <small class="form-text text-muted">Ingrese hasta 15 dígitos (solo números).</small>
                                 </div>
                             </div>
                             <!-- Teléfono Fijo -->
@@ -205,8 +194,28 @@
 </div>
 
 <style>
-    textarea.form-control {
-        min-height: 80px;
-    }
+    textarea.form-control { min-height: 80px; }
+    .card-header-custom{ background: linear-gradient(90deg,#ffd7e6,#ffc4d6); color:#5a2b3a; border-bottom:0; }
+    .btn-primary{ background: linear-gradient(90deg,#ff9bb3,#ffb3c7); border:none; color:#fff; }
 </style>
+
+<script>
+    (function(){
+        const dateInput = document.getElementById('id_fechanacimiento');
+        if(!dateInput) return;
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yyyy = yesterday.toISOString().split('T')[0];
+        // establecer max para navegadores que no recibieron el atributo desde el servidor
+        if(!dateInput.getAttribute('max')) dateInput.max = yyyy;
+        dateInput.addEventListener('input', function(){
+            if(this.value >= new Date().toISOString().split('T')[0]){
+                this.setCustomValidity('Seleccione una fecha anterior a hoy.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    })();
+</script>
 {% endblock %}
