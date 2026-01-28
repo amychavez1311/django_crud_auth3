@@ -16,22 +16,10 @@
                 <!-- Profile Card -->
                 <div class="card shadow-sm border-0 rounded-4 overflow-hidden sticky-top" style="top: 20px;">
                     <!-- Header Background -->
-                    <div style="height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    <div style="height: 80px; background: linear-gradient(135deg, #ff9bb3 0%, #ff7ea6 100%);"></div>
                     
                     <div class="card-body text-center p-4" style="margin-top: -40px; position: relative;">
-                        <!-- Profile Photo -->
-                        <div class="mb-3">
-                            {% if datos.fotoperfil %}
-                                <img src="{{ datos.fotoperfil.url }}" alt="Foto de Perfil" 
-                                     class="profile-photo rounded-circle border-4 border-white shadow-sm" 
-                                     loading="lazy">
-                            {% else %}
-                                <div class="rounded-circle border-4 border-white shadow-sm mx-auto d-flex align-items-center justify-content-center" 
-                                     style="width: 120px; height: 120px; background: #e9ecef;">
-                                    <i class="bi bi-person-fill text-secondary" style="font-size: 3rem;"></i>
-                                </div>
-                            {% endif %}
-                        </div>
+                        <!-- Profile photo removed as requested -->
 
                         <!-- Name -->
                         <h3 class="fw-bold text-dark mb-1">{{ datos.nombres|upper }}</h3>
@@ -42,44 +30,27 @@
                             <p class="text-muted small mb-4">{{ datos.descripcionperfil }}</p>
                         {% endif %}
 
-                        <!-- Edit Button removed from sidebar (moved to header actions) -->
+                        <!-- Edit Button -->
+                        <a href="{% url 'crear_datos_personales' %}" class="btn btn-primary btn-sm rounded-3 w-100 mb-3">
+                            <i class="bi bi-pencil me-1"></i> Editar Datos
+                        </a>
 
                         <hr class="my-4">
 
-                        <!-- Contact Section -->
+                        <!-- Contact Section (icons removed) -->
                         <div class="text-start">
                             <h6 class="fw-bold text-dark mb-3">CONTACTO</h6>
-                            
                             {% if user.email %}
-                            <div class="mb-2">
-                                <i class="bi bi-envelope text-primary"></i>
-                                <small class="d-block text-break">{{ user.email }}</small>
-                            </div>
+                                <div class="mb-2"><small class="d-block text-break">{{ user.email }}</small></div>
                             {% endif %}
-
                             {% if datos.telefonoconvencional %}
-                            <div class="mb-2">
-                                <i class="bi bi-telephone text-primary"></i>
-                                <small class="d-block">{{ datos.telefonoconvencional }}</small>
-                            </div>
+                                <div class="mb-2"><small class="d-block">{{ datos.telefonoconvencional }}</small></div>
                             {% endif %}
-
                             {% if datos.telefonofijo %}
-                            <div class="mb-2">
-                                <i class="bi bi-telephone-fill text-primary"></i>
-                                <small class="d-block">{{ datos.telefonofijo }}</small>
-                            </div>
+                                <div class="mb-2"><small class="d-block">{{ datos.telefonofijo }}</small></div>
                             {% endif %}
-
                             {% if datos.sitioweb %}
-                            <div class="mb-2">
-                                <i class="bi bi-globe text-primary"></i>
-                                <small class="d-block">
-                                    <a href="{{ datos.sitioweb }}" target="_blank" class="text-decoration-none">
-                                        {{ datos.sitioweb }}
-                                    </a>
-                                </small>
-                            </div>
+                                <div class="mb-2"><small class="d-block"><a href="{{ datos.sitioweb }}" target="_blank" class="text-decoration-none">{{ datos.sitioweb }}</a></small></div>
                             {% endif %}
                         </div>
 
@@ -123,25 +94,28 @@
 
             <!-- Main Content (Right) -->
             <div class="col-lg-9">
-                <!-- Header Actions -->
+                <!-- Header Actions (PDF + Edit) -->
                 <div class="mb-4 d-flex gap-2 justify-content-end">
-                    <a href="{% url 'visualizar_cv_pdf' %}" class="btn btn-sm btn-primary rounded-3" style="padding:0.45rem 0.9rem;" target="_blank">
-                        <i class="bi bi-eye me-1"></i>Ver PDF
+                    <a href="{% url 'visualizar_cv_pdf' %}" class="btn btn-sm btn-primary rounded-3" target="_blank">
+                        Ver PDF
                     </a>
-                    <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-outline-soft rounded-3" style="padding:0.45rem 0.9rem;">
-                        <i class="bi bi-pencil-square me-1"></i>Editar Perfil
+                    <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-outline-secondary rounded-3">
+                        Editar Perfil
                     </a>
-                    <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-sm btn-outline-soft rounded-3" style="padding:0.45rem 0.9rem;">
-                        <i class="bi bi-download me-1"></i>Descargar PDF
+                    <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-sm btn-outline-secondary rounded-3">
+                        Descargar PDF
                     </a>
                 </div>
                     
-                <!-- Experiencia Laboral -->
-                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <!-- Experiencia, Formación y Reconocimientos as boxes on the right -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <!-- Experiencia Laboral -->
+                        <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-header bg-white border-0 pt-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-briefcase-fill me-2" style="color: #667eea;"></i>EXPERIENCIA PROFESIONAL
+                                EXPERIECIA PROFESIONAL
                             </h5>
                             <a href="{% url 'crear_experiencia_laboral' %}" class="btn btn-sm btn-outline-primary rounded-3">
                                 <i class="bi bi-plus"></i> Agregar
@@ -156,7 +130,7 @@
                                         <div class="d-flex">
                                             <div class="me-3">
                                                 <div class="timeline-badge rounded-circle" 
-                                                     style="width: 14px; height: 14px; background: #667eea; margin-top: 4px;"></div>
+                                                     style="width: 14px; height: 14px; background: #ff9bb3; margin-top: 4px;"></div>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -200,14 +174,16 @@
                             </div>
                         {% endif %}
                     </div>
-                </div>
+                        </div>
+                    </div>
 
-                <!-- Cursos y Capacitaciones -->
-                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="col-md-6">
+                        <!-- Cursos y Capacitaciones -->
+                        <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-header bg-white border-0 pt-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-mortarboard-fill me-2" style="color: #667eea;"></i>FORMACIÓN Y CURSOS
+                                FORMACIÓN Y CURSOS
                             </h5>
                             <a href="{% url 'crear_curso' %}" class="btn btn-sm btn-outline-primary rounded-3">
                                 <i class="bi bi-plus"></i> Agregar
@@ -222,7 +198,7 @@
                                         <div class="d-flex">
                                             <div class="me-3">
                                                 <div class="timeline-badge rounded-circle" 
-                                                     style="width: 14px; height: 14px; background: #667eea; margin-top: 4px;"></div>
+                                                     style="width: 14px; height: 14px; background: #ff9bb3; margin-top: 4px;"></div>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -267,14 +243,16 @@
                             </div>
                         {% endif %}
                     </div>
-                </div>
+                        </div>
+                    </div>
 
-                <!-- Reconocimientos -->
-                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="col-md-6">
+                        <!-- Reconocimientos -->
+                        <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-header bg-white border-0 pt-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-award-fill me-2" style="color: #667eea;"></i>RECONOCIMIENTOS Y CERTIFICACIONES
+                                RECONOCIMIENTOS Y CERTIFICACIONES
                             </h5>
                             <a href="{% url 'crear_reconocimiento' %}" class="btn btn-sm btn-outline-primary rounded-3">
                                 <i class="bi bi-plus"></i> Agregar
@@ -289,7 +267,7 @@
                                         <div class="d-flex">
                                             <div class="me-3">
                                                 <div class="timeline-badge rounded-circle" 
-                                                     style="width: 14px; height: 14px; background: #667eea; margin-top: 4px;"></div>
+                                                     style="width: 14px; height: 14px; background: #ff9bb3; margin-top: 4px;"></div>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -326,6 +304,8 @@
                             </div>
                         {% endif %}
                     </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Productos Académicos -->
@@ -334,9 +314,11 @@
                     <div class="card-header bg-white border-0 pt-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-files-alt me-2" style="color: #667eea;"></i>PRODUCTOS ACADÉMICOS
+                                PRODUCTOS ACADÉMICOS
                             </h5>
-                                <p class="muted-link">(Agregar productos académicos deshabilitado)</p>
+                            <a href="{% url 'crear_producto_academico' %}" class="btn btn-sm btn-outline-primary rounded-3">
+                                <i class="bi bi-plus"></i> Agregar
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -377,7 +359,7 @@
                     <div class="card-header bg-white border-0 pt-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-bag-check-fill me-2" style="color: #667eea;"></i>PRODUCTOS LABORALES
+                                PRODUCTOS LABORALES
                             </h5>
                             <a href="{% url 'crear_producto_laboral' %}" class="btn btn-sm btn-outline-primary rounded-3">
                                 <i class="bi bi-plus"></i> Agregar
@@ -420,7 +402,7 @@
                     <div class="card-header bg-white border-0 pt-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-shop me-2" style="color: #667eea;"></i>PRODUCTOS EN VENTA
+                                PRODUCTOS EN VENTA
                             </h5>
                             <a href="{% url 'crear_venta_garage' %}" class="btn btn-sm btn-outline-primary rounded-3">
                                 <i class="bi bi-plus"></i> Agregar
@@ -499,8 +481,8 @@
     }
 
     .btn-outline-primary:hover {
-        background: #667eea;
-        border-color: #667eea;
+        background: #ff9bb3;
+        border-color: #ff9bb3;
     }
 
     .min-vh-100 {
