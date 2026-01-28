@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import date
+import re
 from .models import (
     Task, DatosPersonales, ExperienciaLaboral, Reconocimiento,
     CursoRealizado, ProductoAcademico, ProductoLaboral, VentaGarage
@@ -26,12 +27,89 @@ class TaskForm(forms.ModelForm):
 
 class DatosPersonalesForm(forms.ModelForm):
     """Formulario para datos personales"""
+    # Country choices: (code, display)
+    COUNTRY_CHOICES = [
+        ('+1', '+1 United States/Canada'),
+        ('+34', '+34 España'),
+        ('+52', '+52 México'),
+        ('+57', '+57 Colombia'),
+        ('+44', '+44 United Kingdom'),
+        ('+49', '+49 Alemania'),
+        ('+33', '+33 Francia'),
+        ('+39', '+39 Italia'),
+        ('+54', '+54 Argentina'),
+        ('+58', '+58 Venezuela'),
+        ('+91', '+91 India'),
+        ('+81', '+81 Japón'),
+        ('+55', '+55 Brasil'),
+        ('+7', '+7 Rusia'),
+    ]
+
+    class PhoneMultiWidget(forms.MultiWidget):
+        def __init__(self, attrs=None, choices=None):
+            if choices is None:
+                choices = DatosPersonalesForm.COUNTRY_CHOICES
+            widgets = [
+                forms.Select(choices=choices, attrs={'class': 'form-select', 'style': 'max-width:150px; display:inline-block; margin-right:8px;'}),
+                forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número (hasta 12 dígitos)', 'maxlength': '12', 'style': 'display:inline-block; width:calc(100% - 170px);'})
+            ]
+            super().__init__(widgets, attrs)
+
+        def decompress(self, value):
+            if not value:
+                return [None, None]
+            # If value contains a space, split country and number
+            if ' ' in value:
+                parts = value.split(' ', 1)
+                return [parts[0], parts[1]]
+            # Try to match known country codes (longest first)
+            codes = sorted([c for c, _ in DatosPersonalesForm.COUNTRY_CHOICES], key=lambda x: -len(x))
+            for code in codes:
+                if value.startswith(code):
+                    return [code, value[len(code):]]
+            # fallback
+            return [None, value]
+
+    class PhoneMultiValueField(forms.MultiValueField):
+        def __init__(self, *args, **kwargs):
+            choices = kwargs.pop('choices', DatosPersonalesForm.COUNTRY_CHOICES)
+            fields = [
+                forms.ChoiceField(choices=choices),
+                forms.CharField()
+            ]
+            super().__init__(fields=fields, require_all_fields=False, *args, **kwargs)
+
+        def compress(self, data_list):
+            if not data_list:
+                return ''
+            country = data_list[0] or ''
+            number = data_list[1] or ''
+            # Strip non digits from number
+            number_digits = re.sub(r"\D", "", number)
+            return f"{country} {number_digits}".strip()
+
+        def clean(self, value):
+            cleaned = super().clean(value)
+            country = cleaned[0] if cleaned else ''
+            number = cleaned[1] if cleaned else ''
+            number_digits = re.sub(r"\D", "", number or "")
+            if number_digits:
+                if len(number_digits) > 12:
+                    raise ValidationError('El número no puede tener más de 12 dígitos.')
+            return self.compress([country, number_digits])
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Set max attribute on date inputs so UI cannot select future dates
         if 'fechanacimiento' in self.fields:
             self.fields['fechanacimiento'].widget.attrs.setdefault('max', date.today().isoformat())
+        # Replace telefonoconvencional with a multi-field (country + number)
+        if 'telefonoconvencional' in self.fields:
+            self.fields['telefonoconvencional'] = DatosPersonalesForm.PhoneMultiValueField(
+                widget=DatosPersonalesForm.PhoneMultiWidget(choices=DatosPersonalesForm.COUNTRY_CHOICES),
+                required=False,
+                label='Teléfono Convencional',
+            )
 
     class Meta:
         model = DatosPersonales
@@ -79,10 +157,7 @@ class DatosPersonalesForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Licencia de Conducir'
             }),
-            'telefonoconvencional': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Teléfono Convencional'
-            }),
+            # telefonoconvencional uses a custom multiwidget defined in the form
             'telefonofijo': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Teléfono Fijo'
