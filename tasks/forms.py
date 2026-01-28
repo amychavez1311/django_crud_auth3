@@ -1,6 +1,5 @@
 from django import forms
-from django.core.exceptions import ValidationError
-from datetime import date
+from datetime import date, timedelta
 from .models import (
     Task, DatosPersonales, ExperienciaLaboral, Reconocimiento,
     CursoRealizado, ProductoAcademico, ProductoLaboral, VentaGarage
@@ -26,12 +25,17 @@ class TaskForm(forms.ModelForm):
 
 class DatosPersonalesForm(forms.ModelForm):
     """Formulario para datos personales"""
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Set max attribute on date inputs so UI cannot select future dates
-        if 'fechanacimiento' in self.fields:
-            self.fields['fechanacimiento'].widget.attrs.setdefault('max', date.today().isoformat())
-
+        # asegurar que el date input solo permita fechas anteriores a hoy
+        try:
+            yesterday = date.today() - timedelta(days=1)
+            if 'fechanacimiento' in self.fields:
+                self.fields['fechanacimiento'].widget.attrs['max'] = yesterday.isoformat()
+        except Exception:
+            pass
+    
     class Meta:
         model = DatosPersonales
         fields = [
@@ -80,9 +84,7 @@ class DatosPersonalesForm(forms.ModelForm):
             }),
             'telefonoconvencional': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Teléfono convencional',
-                'maxlength': '15',
-                'inputmode': 'numeric'
+                'placeholder': 'Teléfono Convencional'
             }),
             'telefonofijo': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -115,23 +117,25 @@ class DatosPersonalesForm(forms.ModelForm):
 
     def clean_fechanacimiento(self):
         fechanacimiento = self.cleaned_data.get('fechanacimiento')
-        if fechanacimiento and fechanacimiento > date.today():
-            raise ValidationError('La fecha de nacimiento no puede ser posterior al día de hoy.')
+        if fechanacimiento:
+            if fechanacimiento >= date.today():
+                raise forms.ValidationError('La fecha de nacimiento debe ser anterior a hoy.')
         return fechanacimiento
-
-    def clean_telefonoconvencional(self):
-        val = self.cleaned_data.get('telefonoconvencional')
-        if not val:
-            return val
-        # Strip non-digits
-        digits = ''.join(ch for ch in str(val) if ch.isdigit())
-        if len(digits) > 15:
-            raise ValidationError('El número no puede tener más de 15 dígitos.')
-        return digits
 
 
 class ExperienciaLaboralForm(forms.ModelForm):
     """Formulario para experiencia laboral"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            today_iso = date.today().isoformat()
+            # evitar que la fecha de fin supere el día actual
+            if 'fechafingestion' in self.fields:
+                self.fields['fechafingestion'].widget.attrs['max'] = today_iso
+            if 'fechainiciogestion' in self.fields:
+                self.fields['fechainiciogestion'].widget.attrs['max'] = today_iso
+        except Exception:
+            pass
     
     class Meta:
         model = ExperienciaLaboral
@@ -195,6 +199,18 @@ class ExperienciaLaboralForm(forms.ModelForm):
             }),
         }
 
+    def clean(self):
+        cleaned = super().clean()
+        inicio = cleaned.get('fechainiciogestion')
+        fin = cleaned.get('fechafingestion')
+        if inicio and fin:
+            if fin < inicio:
+                self.add_error('fechafingestion', 'La fecha de fin no puede ser anterior a la fecha de inicio.')
+        if fin:
+            if fin > date.today():
+                self.add_error('fechafingestion', 'La fecha de fin no puede ser posterior al día de hoy.')
+        return cleaned
+
 
 class ReconocimientoForm(forms.ModelForm):
     """Formulario para reconocimientos"""
@@ -203,7 +219,7 @@ class ReconocimientoForm(forms.ModelForm):
         model = Reconocimiento
         fields = [
             'tiporeconocimiento', 'fechareconocimiento', 'descripcionreconocimiento',
-            'entidadpatrocinadora', 'nombrecontactoauspicia', 'telefonocontactoauspicia',
+            'entidad patrocinadora', 'nombrecontactoauspicia', 'telefonocontactoauspicia',
             'certificado', 'activo'
         ]
         widgets = {
@@ -221,7 +237,7 @@ class ReconocimientoForm(forms.ModelForm):
                 'placeholder': 'Descripción del Reconocimiento',
                 'rows': 3
             }),
-            'entidadpatrocinadora': forms.TextInput(attrs={
+            'entidad patrocinadora': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Entidad Patrocinadora',
                 'required': 'required'
@@ -246,6 +262,20 @@ class ReconocimientoForm(forms.ModelForm):
 
 class CursoRealizadoForm(forms.ModelForm):
     """Formulario para cursos realizados"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            today_iso = date.today().isoformat()
+            if 'fechafin' in self.fields:
+                self.fields['fechafin'].widget.attrs['max'] = today_iso
+            if 'fechainicio' in self.fields:
+                self.fields['fechainicio'].widget.attrs['max'] = today_iso
+            # si la instancia tiene datospersonales con fechanacimiento, establecer min en fechainicio
+            dp = getattr(self.instance, 'datospersonales', None)
+            if dp and getattr(dp, 'fechanacimiento', None):
+                self.fields['fechainicio'].widget.attrs['min'] = dp.fechanacimiento.isoformat()
+        except Exception:
+            pass
     
     class Meta:
         model = CursoRealizado
@@ -304,6 +334,25 @@ class CursoRealizadoForm(forms.ModelForm):
                 'class': 'form-check-input'
             }),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        inicio = cleaned.get('fechainicio')
+        fin = cleaned.get('fechafin')
+        # verificar coherencia inicio/fin
+        if inicio and fin:
+            if fin < inicio:
+                self.add_error('fechafin', 'La fecha de fin no puede ser anterior a la fecha de inicio.')
+        # fin no puede superar hoy
+        if fin:
+            if fin > date.today():
+                self.add_error('fechafin', 'La fecha de fin no puede ser posterior al día de hoy.')
+        # inicio no puede ser anterior a la fecha de nacimiento asociada
+        dp = getattr(self.instance, 'datospersonales', None)
+        if dp and getattr(dp, 'fechanacimiento', None) and inicio:
+            if inicio < dp.fechanacimiento:
+                self.add_error('fechainicio', 'La fecha de inicio no puede ser anterior a la fecha de nacimiento.')
+        return cleaned
 
 
 class ProductoAcademicoForm(forms.ModelForm):

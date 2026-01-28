@@ -13,496 +13,203 @@
         <div class="row g-4">
             <!-- Sidebar (Left) - Profile & Quick Info -->
             <div class="col-lg-3">
-                <!-- Profile Card -->
-                <div class="card shadow-sm border-0 rounded-4 overflow-hidden sticky-top" style="top: 20px;">
-                    <!-- Header Background -->
-                    <div style="height: 80px; background: linear-gradient(135deg, #ff9bb3 0%, #ff7ea6 100%);"></div>
-                    
-                    <div class="card-body text-center p-4" style="margin-top: -40px; position: relative;">
-                        <!-- Profile photo removed as requested -->
-
-                        <!-- Name -->
-                        <h3 class="fw-bold text-dark mb-1">{{ datos.nombres|upper }}</h3>
-                        <h4 class="fw-bold text-dark mb-3">{{ datos.apellidos|upper }}</h4>
-
-                        <!-- Profile Description -->
-                        {% if datos.descripcionperfil %}
-                            <p class="text-muted small mb-4">{{ datos.descripcionperfil }}</p>
-                        {% endif %}
-
-                        <!-- Edit Button -->
-                        <a href="{% url 'crear_datos_personales' %}" class="btn btn-primary btn-sm rounded-3 w-100 mb-3">
-                            <i class="bi bi-pencil me-1"></i> Editar Datos
-                        </a>
-
-                        <hr class="my-4">
-
-                        <!-- Contact Section (icons removed) -->
-                        <div class="text-start">
-                            <h6 class="fw-bold text-dark mb-3">CONTACTO</h6>
-                            {% if user.email %}
-                                <div class="mb-2"><small class="d-block text-break">{{ user.email }}</small></div>
-                            {% endif %}
-                            {% if datos.telefonoconvencional %}
-                                <div class="mb-2"><small class="d-block">{{ datos.telefonoconvencional }}</small></div>
-                            {% endif %}
-                            {% if datos.telefonofijo %}
-                                <div class="mb-2"><small class="d-block">{{ datos.telefonofijo }}</small></div>
-                            {% endif %}
-                            {% if datos.sitioweb %}
-                                <div class="mb-2"><small class="d-block"><a href="{{ datos.sitioweb }}" target="_blank" class="text-decoration-none">{{ datos.sitioweb }}</a></small></div>
-                            {% endif %}
+<div class="cv-layout">
+    <div class="cv-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="photo-section">
+                <div class="photo-frame">
+                    {% if datos.fotoperfil %}
+                        <img src="{{ datos.fotoperfil.url }}" alt="Foto" class="profile-photo">
+                    {% else %}
+                        <div class="profile-photo" style="background: linear-gradient(135deg,#ffeaf2,#fff0f6); display:flex; align-items:center; justify-content:center;">
+                            <i class="bi bi-person-fill" style="font-size:2.6rem; color:#c76f8a"></i>
                         </div>
-
-                        <hr class="my-4">
-
-                        <!-- Personal Info -->
-                        <div class="text-start">
-                            <h6 class="fw-bold text-dark mb-3">INFORMACIÓN PERSONAL</h6>
-                            
-                            {% if datos.numerocedula %}
-                            <div class="mb-2">
-                                <small class="text-muted d-block">CÉDULA</small>
-                                <small class="fw-bold">{{ datos.numerocedula }}</small>
-                            </div>
-                            {% endif %}
-
-                            {% if datos.nacionalidad %}
-                            <div class="mb-2">
-                                <small class="text-muted d-block">NACIONALIDAD</small>
-                                <small class="fw-bold">{{ datos.nacionalidad }}</small>
-                            </div>
-                            {% endif %}
-
-                            {% if datos.fechanacimiento %}
-                            <div class="mb-2">
-                                <small class="text-muted d-block">NACIMIENTO</small>
-                                <small class="fw-bold">{{ datos.fechanacimiento|date:"d/m/Y" }}</small>
-                            </div>
-                            {% endif %}
-
-                            {% if datos.estadocivil %}
-                            <div class="mb-2">
-                                <small class="text-muted d-block">ESTADO CIVIL</small>
-                                <small class="fw-bold">{{ datos.estadocivil }}</small>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% endif %}
+                </div>
+                <div class="name-title mt-3">
+                    <h1>{{ datos.nombres }} {{ datos.apellidos }}</h1>
+                    {% if datos.descripcionperfil %}<p>{{ datos.descripcionperfil }}</p>{% endif %}
                 </div>
             </div>
 
-            <!-- Main Content (Right) -->
-            <div class="col-lg-9">
-                <!-- Header Actions (PDF + Edit) -->
-                <div class="mb-4 d-flex gap-2 justify-content-end">
-                    <a href="{% url 'visualizar_cv_pdf' %}" class="btn btn-sm btn-primary rounded-3" target="_blank">
-                        Ver PDF
-                    </a>
-                    <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-outline-secondary rounded-3">
-                        Editar Perfil
-                    </a>
-                    <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-sm btn-outline-secondary rounded-3">
-                        Descargar PDF
-                    </a>
-                </div>
-                    
-                <!-- Experiencia, Formación y Reconocimientos as boxes on the right -->
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <!-- Experiencia Laboral -->
-                        <div class="card shadow-sm border-0 rounded-4 mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold text-dark mb-0">
-                                EXPERIECIA PROFESIONAL
-                            </h5>
-                            <a href="{% url 'crear_experiencia_laboral' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        {% if experiencias %}
-                            <div class="timeline">
-                                {% for exp in experiencias %}
-                                    <div class="timeline-item mb-4">
-                                        <div class="d-flex">
-                                            <div class="me-3">
-                                                <div class="timeline-badge rounded-circle" 
-                                                     style="width: 14px; height: 14px; background: #ff9bb3; margin-top: 4px;"></div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1">{{ exp.cargodesempenado }}</h6>
-                                                        <p class="text-muted mb-1"><strong>{{ exp.nombreempresa }}</strong></p>
-                                                        <small class="text-muted">
-                                                            {{ exp.fechainiciogestion|date:"M Y" }}
-                                                            {% if exp.fechafingestion %}
-                                                                - {{ exp.fechafingestion|date:"M Y" }}
-                                                            {% else %}
-                                                                - Presente
-                                                            {% endif %}
-                                                        </small>
-                                                    </div>
-                                                    <div>
-                                                        <a href="{% url 'editar_experiencia_laboral' exp.id %}" class="btn btn-sm btn-outline-warning rounded-2">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </a>
-                                                        <form method="POST" action="{% url 'eliminar_experiencia_laboral' exp.id %}" style="display:inline;">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" onclick="return confirm('¿Eliminar?')">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                                {% if exp.descripcionfunciones %}
-                                                    <p class="small text-muted mb-0">{{ exp.descripcionfunciones }}</p>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                <p class="mb-0 mt-2">Sin experiencias laborales</p>
-                                <a href="{% url 'crear_experiencia_laboral' %}" class="btn btn-sm btn-primary mt-2">Agregar Primera Experiencia</a>
-                            </div>
-                        {% endif %}
-                    </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <!-- Cursos y Capacitaciones -->
-                        <div class="card shadow-sm border-0 rounded-4 mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold text-dark mb-0">
-                                FORMACIÓN Y CURSOS
-                            </h5>
-                            <a href="{% url 'crear_curso' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        {% if cursos %}
-                            <div class="timeline">
-                                {% for curso in cursos %}
-                                    <div class="timeline-item mb-4">
-                                        <div class="d-flex">
-                                            <div class="me-3">
-                                                <div class="timeline-badge rounded-circle" 
-                                                     style="width: 14px; height: 14px; background: #ff9bb3; margin-top: 4px;"></div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1">{{ curso.nombrecurso }}</h6>
-                                                        <p class="text-muted mb-1"><strong>{{ curso.entidadpatrocinadora }}</strong></p>
-                                                        <small class="text-muted">
-                                                            {{ curso.fechainicio|date:"M Y" }}
-                                                            {% if curso.fechafin %}
-                                                                - {{ curso.fechafin|date:"M Y" }}
-                                                            {% endif %}
-                                                            {% if curso.totalhoras %}
-                                                                • {{ curso.totalhoras }} horas
-                                                            {% endif %}
-                                                        </small>
-                                                    </div>
-                                                    <div>
-                                                        <a href="{% url 'editar_curso' curso.id %}" class="btn btn-sm btn-outline-warning rounded-2">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </a>
-                                                        <form method="POST" action="{% url 'eliminar_curso' curso.id %}" style="display:inline;">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" onclick="return confirm('¿Eliminar?')">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                                {% if curso.descripcioncurso %}
-                                                    <p class="small text-muted mb-0">{{ curso.descripcioncurso }}</p>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-book" style="font-size: 2rem;"></i>
-                                <p class="mb-0 mt-2">Sin cursos registrados</p>
-                                <a href="{% url 'crear_curso' %}" class="btn btn-sm btn-primary mt-2">Agregar Curso</a>
-                            </div>
-                        {% endif %}
-                    </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <!-- Reconocimientos -->
-                        <div class="card shadow-sm border-0 rounded-4 mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold text-dark mb-0">
-                                RECONOCIMIENTOS Y CERTIFICACIONES
-                            </h5>
-                            <a href="{% url 'crear_reconocimiento' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        {% if reconocimientos %}
-                            <div class="timeline">
-                                {% for reco in reconocimientos %}
-                                    <div class="timeline-item mb-4">
-                                        <div class="d-flex">
-                                            <div class="me-3">
-                                                <div class="timeline-badge rounded-circle" 
-                                                     style="width: 14px; height: 14px; background: #ff9bb3; margin-top: 4px;"></div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1">{{ reco.get_tiporeconocimiento_display }}</h6>
-                                                        <p class="text-muted mb-1"><strong>{{ reco.entidadpatrocinadora }}</strong></p>
-                                                        <small class="text-muted">{{ reco.fechareconocimiento|date:"d M Y" }}</small>
-                                                    </div>
-                                                    <div>
-                                                        <a href="{% url 'editar_reconocimiento' reco.id %}" class="btn btn-sm btn-outline-warning rounded-2">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </a>
-                                                        <form method="POST" action="{% url 'eliminar_reconocimiento' reco.id %}" style="display:inline;">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" onclick="return confirm('¿Eliminar?')">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                                {% if reco.descripcionreconocimiento %}
-                                                    <p class="small text-muted mb-0">{{ reco.descripcionreconocimiento }}</p>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-star" style="font-size: 2rem;"></i>
-                                <p class="mb-0 mt-2">Sin reconocimientos registrados</p>
-                                <a href="{% url 'crear_reconocimiento' %}" class="btn btn-sm btn-primary mt-2">Agregar Reconocimiento</a>
-                            </div>
-                        {% endif %}
-                    </div>
-                        </div>
+            <div class="sidebar-section">
+                <h3>Contacto</h3>
+                <div class="contact-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <div>
+                        {% if user.email %}<div>{{ user.email }}</div>{% endif %}
+                        {% if datos.sitioweb %}<a href="{{ datos.sitioweb }}" target="_blank">{{ datos.sitioweb }}</a>{% endif %}
                     </div>
                 </div>
+                {% if datos.telefonoconvencional %}
+                <div class="contact-item"><i class="bi bi-telephone-fill"></i><div>{{ datos.telefonoconvencional }}</div></div>
+                {% endif %}
+                {% if datos.telefonofijo %}
+                <div class="contact-item"><i class="bi bi-telephone"></i><div>{{ datos.telefonofijo }}</div></div>
+                {% endif %}
+            </div>
 
-                <!-- Productos Académicos -->
-                {% if productos_academicos %}
-                <div class="card shadow-sm border-0 rounded-4 mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold text-dark mb-0">
-                                PRODUCTOS ACADÉMICOS
-                            </h5>
-                            <a href="{% url 'crear_producto_academico' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
+            <div class="sidebar-section">
+                <h3>Datos</h3>
+                {% if datos.numerocedula %}<div><strong>Cédula:</strong> {{ datos.numerocedula }}</div>{% endif %}
+                {% if datos.nacionalidad %}<div><strong>Nacionalidad:</strong> {{ datos.nacionalidad }}</div>{% endif %}
+                {% if datos.fechanacimiento %}<div><strong>Nacimiento:</strong> {{ datos.fechanacimiento|date:"d/m/Y" }}</div>{% endif %}
+                {% if datos.estadocivil %}<div><strong>Estado Civil:</strong> {{ datos.estadocivil }}</div>{% endif %}
+            </div>
+
+            <div class="sidebar-section" style="margin-top:auto;">
+                <a href="{% url 'crear_datos_personales' %}" class="btn add-btn w-100">Editar Datos</a>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{% url 'visualizar_cv_pdf' %}" target="_blank" class="btn btn-primary me-2">Ver PDF</a>
+                <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-outline-soft">Descargar</a>
+            </div>
+
+            <div class="content-grid">
+                <!-- Experiencia -->
+                <section class="section card">
+                    <div class="section-header">
+                        <h2 class="section-title">Experiencia Profesional</h2>
+                        <a href="{% url 'crear_experiencia_laboral' %}" class="add-btn">Agregar</a>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
+                    {% if experiencias %}
+                        {% for exp in experiencias %}
+                            <div class="mb-3">
+                                <h5 class="mb-0">{{ exp.cargodesempenado }}</h5>
+                                <small class="text-muted">{{ exp.nombreempresa }} • {{ exp.fechainiciogestion|date:"M Y" }}{% if exp.fechafingestion %} - {{ exp.fechafingestion|date:"M Y" }}{% else %} - Presente{% endif %}</small>
+                                {% if exp.descripcionfunciones %}<p class="mt-2 small">{{ exp.descripcionfunciones }}</p>{% endif %}
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'editar_experiencia_laboral' exp.id %}" class="btn btn-outline-soft">Editar</a>
+                                    <form method="POST" action="{% url 'eliminar_experiencia_laboral' exp.id %}">{% csrf_token %}<button class="btn btn-outline-soft">Eliminar</button></form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">Sin experiencias registradas. <a href="{% url 'crear_experiencia_laboral' %}">Agregar</a></div>
+                    {% endif %}
+                </section>
+
+                <!-- Cursos -->
+                <section class="section card">
+                    <div class="section-header">
+                        <h2 class="section-title">Formación y Cursos</h2>
+                        <a href="{% url 'crear_curso' %}" class="add-btn">Agregar</a>
+                    </div>
+                    {% if cursos %}
+                        {% for curso in cursos %}
+                            <div class="mb-3">
+                                <h5 class="mb-0">{{ curso.nombrecurso }}</h5>
+                                <small class="text-muted">{{ curso.entidadpatrocinadora }} • {{ curso.fechainicio|date:"M Y" }}{% if curso.fechafin %} - {{ curso.fechafin|date:"M Y" }}{% endif %}{% if curso.totalhoras %} • {{ curso.totalhoras }} hrs{% endif %}</small>
+                                {% if curso.descripcioncurso %}<p class="mt-2 small">{{ curso.descripcioncurso }}</p>{% endif %}
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'editar_curso' curso.id %}" class="btn btn-outline-soft">Editar</a>
+                                    <form method="POST" action="{% url 'eliminar_curso' curso.id %}">{% csrf_token %}<button class="btn btn-outline-soft">Eliminar</button></form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">Sin cursos registrados. <a href="{% url 'crear_curso' %}">Agregar</a></div>
+                    {% endif %}
+                </section>
+
+                <!-- Reconocimientos -->
+                <section class="section card">
+                    <div class="section-header">
+                        <h2 class="section-title">Reconocimientos</h2>
+                        <a href="{% url 'crear_reconocimiento' %}" class="add-btn">Agregar</a>
+                    </div>
+                    {% if reconocimientos %}
+                        {% for reco in reconocimientos %}
+                            <div class="mb-3">
+                                <h5 class="mb-0">{{ reco.get_tiporeconocimiento_display }}</h5>
+                                <small class="text-muted">{{ reco.entidadpatrocinadora }} • {{ reco.fechareconocimiento|date:"d M Y" }}</small>
+                                {% if reco.descripcionreconocimiento %}<p class="mt-2 small">{{ reco.descripcionreconocimiento }}</p>{% endif %}
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'editar_reconocimiento' reco.id %}" class="btn btn-outline-soft">Editar</a>
+                                    <form method="POST" action="{% url 'eliminar_reconocimiento' reco.id %}">{% csrf_token %}<button class="btn btn-outline-soft">Eliminar</button></form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">Sin reconocimientos. <a href="{% url 'crear_reconocimiento' %}">Agregar</a></div>
+                    {% endif %}
+                </section>
+
+                <!-- Productos (combinado) -->
+                <section class="section card">
+                    <div class="section-header">
+                        <h2 class="section-title">Productos y Ventas</h2>
+                        <div></div>
+                    </div>
+                    {% if productos_academicos %}
+                        <h6>Académicos</h6>
+                        <div class="row">
                             {% for prod in productos_academicos %}
-                                <div class="col-md-6">
-                                    <div class="border rounded-3 p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <h6 class="fw-bold mb-1">{{ prod.nombrerecurso }}</h6>
-                                                <small class="text-muted">{{ prod.clasificador }}</small>
-                                            </div>
-                                            <div>
-                                                <a href="{% url 'editar_producto_academico' prod.id %}" class="btn btn-sm btn-outline-warning rounded-2">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <form method="POST" action="{% url 'eliminar_producto_academico' prod.id %}" style="display:inline;">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" onclick="return confirm('¿Eliminar?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6 mb-2">
+                                    <div class="card p-2">
+                                        <strong>{{ prod.nombrerecurso }}</strong>
+                                        <div class="small text-muted">{{ prod.clasificador }}</div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
-                </div>
-                {% else %}
-                <p class="text-muted">No hay productos académicos registrados. <a href="{% url 'crear_producto_academico' %}">Agregar uno</a></p>
-                {% endif %}
+                    {% endif %}
 
-                <!-- Productos Laborales -->
-                {% if productos_laborales %}
-                <div class="card shadow-sm border-0 rounded-4 mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold text-dark mb-0">
-                                PRODUCTOS LABORALES
-                            </h5>
-                            <a href="{% url 'crear_producto_laboral' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
+                    {% if productos_laborales %}
+                        <h6 class="mt-3">Laborales</h6>
+                        <div class="row">
                             {% for prod in productos_laborales %}
-                                <div class="col-md-6">
-                                    <div class="border rounded-3 p-3">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h6 class="fw-bold mb-1">{{ prod.nombreproducto }}</h6>
-                                                <small class="text-muted d-block">{{ prod.fechaproducto|date:"d M Y" }}</small>
-                                            </div>
-                                            <div>
-                                                <a href="{% url 'editar_producto_laboral' prod.id %}" class="btn btn-sm btn-outline-warning rounded-2">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <form method="POST" action="{% url 'eliminar_producto_laboral' prod.id %}" style="display:inline;">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" onclick="return confirm('¿Eliminar?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6 mb-2">
+                                    <div class="card p-2">
+                                        <strong>{{ prod.nombreproducto }}</strong>
+                                        <div class="small text-muted">{{ prod.fechaproducto|date:"d M Y" }}</div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
-                </div>
-                {% endif %}
+                    {% endif %}
 
-                <!-- Ventas -->
-                {% if ventas %}
-                <div class="card shadow-sm border-0 rounded-4 mb-4">
-                    <div class="card-header bg-white border-0 pt-4 pb-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold text-dark mb-0">
-                                PRODUCTOS EN VENTA
-                            </h5>
-                            <a href="{% url 'crear_venta_garage' %}" class="btn btn-sm btn-outline-primary rounded-3">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
+                    {% if ventas %}
+                        <h6 class="mt-3">En Venta</h6>
+                        <div class="row">
                             {% for venta in ventas %}
-                                <div class="col-md-6">
-                                    <div class="border rounded-3 p-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <h6 class="fw-bold mb-1">{{ venta.nombreproducto }}</h6>
-                                                <small class="text-muted d-block">
-                                                    <span class="badge bg-{% if venta.estadoproducto == 'Bueno' %}success{% elif venta.estadoproducto == 'Regular' %}warning{% else %}danger{% endif %}">
-                                                        {{ venta.estadoproducto }}
-                                                    </span>
-                                                </small>
-                                                <strong class="text-primary">${{ venta.valordelbien }}</strong>
-                                            </div>
-                                            <div>
-                                                <a href="{% url 'editar_venta_garage' venta.id %}" class="btn btn-sm btn-outline-warning rounded-2">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <form method="POST" action="{% url 'eliminar_venta_garage' venta.id %}" style="display:inline;">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" onclick="return confirm('¿Eliminar?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6 mb-2">
+                                    <div class="card p-2">
+                                        <strong>{{ venta.nombreproducto }}</strong>
+                                        <div class="small text-muted">{{ venta.estadoproducto }} • ${{ venta.valordelbien }}</div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
-                </div>
-                {% endif %}
+                    {% endif %}
+                </section>
             </div>
-        </div>
+        </main>
     </div>
-</div>
-
-<style>
-    .timeline {
-        position: relative;
-        padding: 0;
-    }
-
-    .timeline-item {
-        position: relative;
-    }
-
-    .timeline-item:not(:last-child)::before {
-        content: '';
-        position: absolute;
-        left: 6px;
-        top: 30px;
-        width: 2px;
-        height: calc(100% + 10px);
-        background: #e9ecef;
-    }
-
-    .timeline-badge {
-        flex-shrink: 0;
-    }
-
-    .card {
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-outline-primary:hover {
-        background: #ff9bb3;
-        border-color: #ff9bb3;
-    }
-
-    .min-vh-100 {
-        min-height: 100vh;
-    }
-
-    .sticky-top {
-        top: 20px;
-    }
-
-    @media (max-width: 991px) {
-        .sticky-top {
-            position: static;
-        }
-    }
-</style>
-
-                </div>
-            </div>
-        </div>
     </div>
-</div>
+
+    <style>
+        /* Small adjustments that complement tasks/static/tasks/css/style.css */
+        .cv-layout{ padding:2.2rem; background: linear-gradient(135deg,#fffafc 0%, #fff7fb 100%);} 
+        .cv-container{ max-width:1180px; margin:0 auto; display:flex; gap:1.6rem; }
+        .sidebar{ flex:0 0 320px; display:flex; flex-direction:column; background:linear-gradient(180deg,#ffdede 0%, #ffc4d0 60%, #ff9bb3 100%); color:#4a2330; border-radius:16px; padding:1rem; }
+        .main-content{ flex:1; }
+        .photo-frame{ width:120px; height:120px; margin:0 auto; border-radius:50%; overflow:hidden; border:6px solid rgba(255,255,255,0.6); }
+        .profile-photo{ width:100%; height:100%; object-fit:cover; display:block; }
+        .name-title h1{ margin:0; font-size:1.25rem; color:#5a2b3a; }
+        .name-title p{ margin:0.3rem 0 0; color:#5a2b3a; }
+        .section-title{ font-weight:800; color:#5a2b3a; }
+        .add-btn{ background:transparent; border:2px solid rgba(255,120,150,0.12); color:#ff6f98; padding:0.35rem 0.9rem; border-radius:999px; font-weight:700; }
+        .card{ border-radius:12px; box-shadow:0 8px 22px rgba(120,90,110,0.04); padding:1rem; }
+        .empty-state{ padding:1rem; border-radius:10px; background:linear-gradient(180deg,#fff6fb,#fff0f5); text-align:center; color:#8a6b76; }
+        .btn-primary{ background: linear-gradient(90deg,#ff9bb3,#ffb3c7); border:none; color:#fff; }
+        .btn-outline-soft{ background:transparent; border:2px solid rgba(100,80,90,0.06); padding:0.35rem 0.6rem; border-radius:8px; }
+        @media (max-width:1024px){ .cv-container{ flex-direction:column; } .sidebar{ width:100%; flex:0 0 auto; } }
+    </style>
+
 {% endblock %}
