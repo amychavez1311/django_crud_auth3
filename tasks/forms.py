@@ -242,8 +242,8 @@ class DatosPersonalesForm(forms.ModelForm):
             if choices is None:
                 choices = DatosPersonalesForm.COUNTRY_CHOICES
             widgets = [
-                forms.Select(choices=choices, attrs={'class': 'form-select', 'style': 'max-width:150px; display:inline-block; margin-right:8px;'}),
-                forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número (hasta 12 dígitos)', 'maxlength': '12', 'style': 'display:inline-block; width:calc(100% - 170px);'})
+                 forms.Select(choices=choices, attrs={'class': 'form-select', 'style': 'width:110px; display:inline-block; margin-right:8px;'}),
+                 forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número', 'maxlength': '12', 'style': 'display:inline-block; width:calc(100% - 128px);'})
             ]
             super().__init__(widgets, attrs)
 
