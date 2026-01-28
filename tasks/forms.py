@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from datetime import date
 from .models import (
     Task, DatosPersonales, ExperienciaLaboral, Reconocimiento,
     CursoRealizado, ProductoAcademico, ProductoLaboral, VentaGarage
@@ -25,6 +27,12 @@ class TaskForm(forms.ModelForm):
 class DatosPersonalesForm(forms.ModelForm):
     """Formulario para datos personales"""
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set max attribute on date inputs so UI cannot select future dates
+        if 'fechanacimiento' in self.fields:
+            self.fields['fechanacimiento'].widget.attrs.setdefault('max', date.today().isoformat())
+
     class Meta:
         model = DatosPersonales
         fields = [
@@ -103,6 +111,12 @@ class DatosPersonalesForm(forms.ModelForm):
                 'class': 'form-check-input'
             }),
         }
+
+    def clean_fechanacimiento(self):
+        fechanacimiento = self.cleaned_data.get('fechanacimiento')
+        if fechanacimiento and fechanacimiento > date.today():
+            raise ValidationError('La fecha de nacimiento no puede ser posterior al día de hoy.')
+        return fechanacimiento
 
 
 class ExperienciaLaboralForm(forms.ModelForm):

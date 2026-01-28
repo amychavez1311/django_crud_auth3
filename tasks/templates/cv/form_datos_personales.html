@@ -85,6 +85,12 @@
                                 <div class="mb-3">
                                     <label for="id_fechanacimiento" class="form-label">Fecha de Nacimiento</label>
                                     {{ form.fechanacimiento }}
+                                    {% if form.fechanacimiento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.fechanacimiento.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">No se permiten fechas posteriores a hoy.</small>
                                 </div>
                             </div>
                             <!-- Nacionalidad -->
