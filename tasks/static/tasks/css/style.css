@@ -181,3 +181,24 @@ footer.site-footer {
 /* Layout wrapper to keep CV visible under header */
 .cv-layout { padding: 1.2rem; box-sizing: border-box; }
 
+/* For pages using the base `.container`, expand the CV layout to full viewport width
+   so the CV occupies the available horizontal space instead of staying centered. */
+.site-content.container > .cv-layout {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  max-width: none;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+  box-sizing: border-box;
+}
+
+/* Reduce vertical margins so the CV fills more of the page height */
+.site-content.container {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
