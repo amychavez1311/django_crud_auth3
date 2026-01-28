@@ -24,6 +24,8 @@ html, body {
 .photo-frame{ width:200px; height:200px; margin:0 auto 1rem; border-radius:50%; background:linear-gradient(135deg,#f7d7e7,#d6e7ff); border:6px solid rgba(255,255,255,0.9); box-shadow:0 12px 30px rgba(200,120,150,0.08); }
 .name-title h1{ font-family: 'Playfair Display', serif; margin:0; font-size:1.6rem; color:#fff; }
 .name-title p{ margin:0.3rem 0 0; color:#fffefe; font-weight:600; font-size:0.9rem; }
+/* Profile photo customization */
+.profile-photo{ width:120px; height:120px; object-fit:cover; border-radius:50%; display:block; margin:0 auto; box-shadow:0 8px 22px rgba(170,110,140,0.08); }
 
 .sidebar-section{ padding:1.2rem 1.6rem; border-top:1px solid rgba(255,255,255,0.06); }
 .sidebar-section h3{ margin:0 0 0.8rem 0; font-weight:800; letter-spacing:0.6px; color:#fff; font-size:0.88rem; }
