@@ -5,7 +5,6 @@
   --muted: #6b6b6b;
   --card: #ffffff;
   --shadow: 0 6px 18px rgba(183, 102, 140, 0.12);
-  --header-height: 76px; /* altura estimada del header (ajustable) */
 }
 
 html, body {
@@ -171,66 +170,5 @@ footer.site-footer {
   .sidebar { padding-bottom:2rem; }
   .main-content { padding:2rem; }
   .footer-actions { position:relative; margin-top:2rem; justify-content:center; }
-}
-
-/* Fullscreen horizontal CV layout (ocupa toda la pantalla debajo del header) */
-.cv-fullscreen {
-  position: fixed;
-  top: var(--header-height);
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  background: linear-gradient(180deg, #fffafc 0%, #fff6fb 100%);
-  overflow: hidden;
-  z-index: 10;
-}
-
-.cv-fullscreen .cv-container {
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  border-radius: 0;
-  display: flex;
-  flex-direction: row;
-  box-shadow: none;
-  overflow: hidden;
-}
-
-.cv-fullscreen .sidebar { flex: 0 0 32%; min-width: 280px; height: 100%; }
-.cv-fullscreen .main-content { flex: 1 1 auto; height: 100%; padding: 2.4rem; position: relative; overflow: hidden; }
-
-/* Escalado y adaptabilidad para evitar scrolls */
-.cv-fullscreen, .cv-fullscreen .cv-container, .cv-fullscreen .sidebar, .cv-fullscreen .main-content {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Ajustes de tipografía para que el contenido quepa en pantalla */
-.cv-fullscreen { font-size: clamp(12px, 0.95vw, 16px); }
-.cv-fullscreen .name-title h1 { font-size: clamp(1.25rem, 2.6vw, 2rem); }
-.cv-fullscreen .name-title p { font-size: clamp(0.85rem, 1.6vw, 1rem); }
-.cv-fullscreen .section-title { font-size: clamp(1rem, 1.8vw, 1.6rem); }
-
-/* Evitar scrolls: truncar y esconder overflow si es necesario */
-.cv-fullscreen .content-grid { gap: 1.2rem; grid-template-columns: repeat(2, minmax(0,1fr)); max-height: calc(100% - 120px); overflow: hidden; }
-.cv-fullscreen .section { height: auto; overflow: hidden; }
-.cv-fullscreen .empty-state, .cv-fullscreen .card { height: 100%; overflow: hidden; }
-
-/* Foto responsiva dentro del sidebar */
-.cv-fullscreen .photo-frame { width: 180px; height: 180px; margin-bottom: 1rem; }
-.cv-fullscreen .photo-placeholder svg { width: 70px; height: 70px; }
-
-/* Footer actions dentro del main adaptado */
-.cv-fullscreen .footer-actions { position: absolute; bottom: 1.6rem; right: 2rem; }
-
-/* Small screens: desactivar fullscreen para móviles para evitar problemas de usabilidad */
-@media (max-width: 900px) {
-  .cv-fullscreen { position: static; height: auto; }
-  .cv-fullscreen .cv-container { display: grid; grid-template-columns: 1fr; height: auto; }
-  .cv-fullscreen .sidebar { min-width: auto; }
-  .cv-fullscreen { font-size: 14px; }
 }
 
