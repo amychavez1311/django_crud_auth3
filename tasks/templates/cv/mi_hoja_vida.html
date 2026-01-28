@@ -19,18 +19,7 @@
                     <div style="height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
                     
                     <div class="card-body text-center p-4" style="margin-top: -40px; position: relative;">
-                        <!-- Profile Photo -->
-                        <div class="mb-3">
-                            {% if datos.fotoperfil %}
-                                <img src="{{ datos.fotoperfil.url }}" alt="Foto de Perfil" 
-                                     class="profile-photo rounded-circle border-4 border-white shadow-sm" 
-                                     loading="lazy">
-                            {% else %}
-                                <div class="rounded-circle border-4 border-white shadow-sm mx-auto d-flex align-items-center justify-content-center" 
-                                     style="width: 120px; height: 120px; background: #e9ecef;">
-                                    <i class="bi bi-person-fill text-secondary" style="font-size: 3rem;"></i>
-                                </div>
-                            {% endif %}
+
                         </div>
 
                         <!-- Name -->
