@@ -5,12 +5,11 @@
   --muted: #6b6b6b;
   --card: #ffffff;
   --shadow: 0 6px 18px rgba(183, 102, 140, 0.12);
-  --header-height: 76px;
 }
 
 html, body {
   height: 100%;
-  background: linear-gradient(135deg, #fff0f5 0%, #ffeef8 30%, #eaf6ff 65%, #f3fff0 100%);
+  background: linear-gradient(180deg, #fffafc 0%, #fff6fb 100%);
   font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   color: var(--muted);
 }
@@ -107,15 +106,13 @@ footer.site-footer {
 /* CV feminine template styles (migrated from mi_hoja_vida template) */
 .cv-container {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1600px;
   background: var(--card);
-  border-radius: 26px;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  box-shadow: 0 30px 80px rgba(255, 154, 158, 0.12);
+  border-radius: 30px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  box-shadow: 0 30px 80px rgba(255, 154, 158, 0.18);
   overflow: hidden;
-  height: auto;
 }
 
 .sidebar {
@@ -124,13 +121,10 @@ footer.site-footer {
   display: flex;
   flex-direction: column;
   position: relative;
-  flex: 0 0 360px;
-  min-width: 300px;
-  padding-bottom: 2rem;
 }
 
-.photo-section { padding: 3.6rem 2.4rem 2.2rem; text-align:center; z-index:1; }
-.photo-frame { width:240px; height:240px; margin:0 auto 1.8rem; border-radius:50%; overflow:hidden; border:6px solid #fff; box-shadow: 0 18px 48px rgba(255,154,158,0.35); background:#fff; }
+.photo-section { padding: 3rem 2rem 2rem; text-align:center; z-index:1; }
+.photo-frame { width:220px; height:220px; margin:0 auto 1.5rem; border-radius:50%; overflow:hidden; border:6px solid #fff; box-shadow: 0 15px 40px rgba(255,154,158,0.4); background:#fff; }
 .photo-placeholder { width:100%; height:100%; background:linear-gradient(135deg,#fbc2eb 0%,#a6c1ee 100%); display:flex; align-items:center; justify-content:center; font-size:5rem; }
 .name-title h1 { font-family: 'Playfair Display', serif; font-size:2rem; font-weight:700; margin-bottom:0.3rem; color:#fff; }
 .name-title p { font-size:1rem; color:#fff; font-weight:600; text-transform:uppercase; opacity:0.95; }
@@ -143,8 +137,8 @@ footer.site-footer {
 
 .profile-text { font-size:0.9rem; line-height:1.7; color:#fff; opacity:0.95; text-align:justify; }
 
-.main-content { padding:3.2rem; overflow-y:auto; background: linear-gradient(to bottom,#ffffff 0%, #fff5f8 100%); }
-.content-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:2.6rem; margin-bottom:2.6rem; }
+.main-content { padding:3rem; overflow-y:auto; background: linear-gradient(to bottom,#ffffff 0%, #fff5f8 100%); }
+.content-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:2rem; margin-bottom:2rem; }
 .section { animation: fadeInUp 0.6s ease-out both; }
 .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; }
 .section-title { font-family: 'Playfair Display', serif; font-size:1.6rem; font-weight:700; color:var(--muted); padding-bottom:0.6rem; }
@@ -160,44 +154,21 @@ footer.site-footer {
 .btn-edit { background: linear-gradient(135deg,#fbc2eb,#a6c1ee); color:#fff; }
 .btn-delete { background: linear-gradient(135deg,#ff9a9e,#fad0c4); color:#fff; }
 
-.footer-actions { position:sticky; bottom:1.6rem; right:2rem; display:flex; gap:1.2rem; }
+.footer-actions { position:absolute; bottom:2rem; right:3rem; display:flex; gap:1rem; }
 .btn-primary.btn-edit-main { padding:1rem 2.5rem; border-radius:50px; border:none; font-weight:700; font-size:0.95rem; text-transform:uppercase; letter-spacing:1px; color:#fff; display:flex; align-items:center; gap:0.6rem; }
 .btn-pdf { background: linear-gradient(135deg,#ff9a9e,#fad0c4); }
 .btn-download { background: linear-gradient(135deg,#fbc2eb,#a6c1ee); }
 
 @media (max-width: 1400px) {
-  .cv-container { height: auto; max-width: 980px; }
+  .cv-container { grid-template-columns: 320px 1fr; }
   .content-grid { grid-template-columns: 1fr; }
   .photo-frame { width:180px; height:180px; }
 }
 
 @media (max-width: 1024px) {
-  .cv-container { flex-direction: column; height: auto; }
-  .sidebar { padding-bottom:2rem; width: 100%; }
+  .cv-container { grid-template-columns: 1fr; }
+  .sidebar { padding-bottom:2rem; }
   .main-content { padding:2rem; }
   .footer-actions { position:relative; margin-top:2rem; justify-content:center; }
-}
-
-/* Layout wrapper to keep CV visible under header */
-.cv-layout { padding: 1.2rem; box-sizing: border-box; }
-
-/* For pages using the base `.container`, expand the CV layout to full viewport width
-   so the CV occupies the available horizontal space instead of staying centered. */
-.site-content.container > .cv-layout {
-  position: relative;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 1220px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  box-sizing: border-box;
-  display:flex;
-  justify-content:center;
-}
-
-/* Reduce vertical margins so the CV fills more of the page height */
-.site-content.container {
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
 }
 
