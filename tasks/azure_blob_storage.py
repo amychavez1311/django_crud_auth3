@@ -128,21 +128,38 @@ class AzureBlobStorage(Storage):
     def url(self, name):
         """Obtiene la URL pública de un archivo"""
         try:
-            blob_client = self._get_blob_client(name)
-            
-            # Generar SAS URL si se configura privado
-            if getattr(settings, 'AZURE_STORAGE_USE_SAS', False):
-                sas_token = generate_blob_sas(
-                    account_name=self.account_name,
-                    container_name=self.container_name,
-                    blob_name=name,
-                    account_key=self._get_account_key(),
-                    permission=BlobSasPermissions(read=True),
-                    expiry=datetime.utcnow() + timedelta(days=365)
-                )
-                return f"{blob_client.url}?{sas_token}"
+            # Construir la URL manualmente si es posible
+            if self.account_name:
+                base_url = f"https://{self.account_name}.blob.core.windows.net/{self.container_name}/{name}"
+                
+                # Si se requiere SAS token para acceso privado
+                if getattr(settings, 'AZURE_STORAGE_USE_SAS', False):
+                    sas_token = generate_blob_sas(
+                        account_name=self.account_name,
+                        container_name=self.container_name,
+                        blob_name=name,
+                        account_key=self._get_account_key(),
+                        permission=BlobSasPermissions(read=True),
+                        expiry=datetime.utcnow() + timedelta(days=365)
+                    )
+                    return f"{base_url}?{sas_token}"
+                else:
+                    return base_url
             else:
-                return blob_client.url
+                # Fallback: usar la URL del blob client
+                blob_client = self._get_blob_client(name)
+                if getattr(settings, 'AZURE_STORAGE_USE_SAS', False):
+                    sas_token = generate_blob_sas(
+                        account_name=self.account_name,
+                        container_name=self.container_name,
+                        blob_name=name,
+                        account_key=self._get_account_key(),
+                        permission=BlobSasPermissions(read=True),
+                        expiry=datetime.utcnow() + timedelta(days=365)
+                    )
+                    return f"{blob_client.url}?{sas_token}"
+                else:
+                    return blob_client.url
                 
         except Exception as e:
             print(f"Error obteniendo URL: {e}")
