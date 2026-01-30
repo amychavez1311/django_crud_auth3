@@ -36,6 +36,24 @@ class DatosPersonalesForm(forms.ModelForm):
         except Exception:
             pass
     
+    def clean_numerocedula(self):
+        """Valida que la cédula tenga máximo 10 dígitos y solo números"""
+        numerocedula = self.cleaned_data.get('numerocedula', '').strip()
+        
+        # Validar que solo contiene números
+        if not numerocedula.isdigit():
+            raise forms.ValidationError('La cédula solo puede contener números.')
+        
+        # Validar longitud máxima
+        if len(numerocedula) > 10:
+            raise forms.ValidationError('La cédula no puede exceder 10 dígitos.')
+        
+        # Validar que no esté vacío
+        if not numerocedula:
+            raise forms.ValidationError('La cédula es requerida.')
+        
+        return numerocedula
+    
     class Meta:
         model = DatosPersonales
         fields = [
@@ -71,7 +89,10 @@ class DatosPersonalesForm(forms.ModelForm):
             'numerocedula': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Número de Cédula',
-                'required': 'required'
+                'required': 'required',
+                'maxlength': '10',
+                'pattern': '[0-9]*',
+                'title': 'Solo números (máximo 10 dígitos)'
             }),
             'sexo': forms.Select(attrs={'class': 'form-control'}),
             'estadocivil': forms.TextInput(attrs={
