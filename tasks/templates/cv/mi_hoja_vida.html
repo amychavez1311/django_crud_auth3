@@ -323,19 +323,19 @@
                 {% if experiencias %}
                     {% for exp in experiencias %}
                     <div class="experience-item">
-                        <div class="item-title">{{ exp.cargo }}</div>
-                        <div class="item-subtitle">{{ exp.empresa }}</div>
+                        <div class="item-title">{{ exp.cargodesempenado }}</div>
+                        <div class="item-subtitle">{{ exp.nombreempresa }}</div>
                         <div class="item-date">
                             <i class="bi bi-calendar3"></i>
-                            {{ exp.fecha_inicio|date:"M Y" }}
-                            {% if exp.fecha_fin %}
-                                - {{ exp.fecha_fin|date:"M Y" }}
+                            {{ exp.fechainiciogestion|date:"d \d\e M \d\e Y" }}
+                            {% if exp.fechafingestion %}
+                                - {{ exp.fechafingestion|date:"d \d\e M \d\e Y" }}
                             {% else %}
                                 - Presente
                             {% endif %}
                         </div>
-                        {% if exp.descripcion %}
-                        <div class="item-description">{{ exp.descripcion }}</div>
+                        {% if exp.descripcionfunciones %}
+                        <div class="item-description">{{ exp.descripcionfunciones }}</div>
                         {% endif %}
                         
                         <div class="mt-3">
@@ -378,13 +378,11 @@
                     {% for curso in cursos %}
                     <div class="course-item">
                         <div class="item-title">{{ curso.nombrecurso }}</div>
-                        {% if curso.institucion %}
-                        <div class="item-subtitle">{{ curso.institucion }}</div>
-                        {% endif %}
+                        <div class="item-subtitle">{{ curso.entidadpatrocinadora }}</div>
                         <div class="item-date">
                             <i class="bi bi-calendar3"></i>
-                            {{ curso.fecha_inicio|date:"M Y" }}
-                            {% if curso.fecha_fin %} - {{ curso.fecha_fin|date:"M Y" }}{% endif %}
+                            {{ curso.fechainicio|date:"d \d\e M \d\e Y" }}
+                            {% if curso.fechafin %} - {{ curso.fechafin|date:"d \d\e M \d\e Y" }}{% endif %}
                             {% if curso.totalhoras %} | {{ curso.totalhoras }} horas{% endif %}
                         </div>
                         {% if curso.descripcioncurso %}
@@ -423,7 +421,6 @@
             </div>
             
             <!-- Reconocimientos -->
-            {% if reconocimientos %}
             <div class="section-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="section-title mb-0">
@@ -435,35 +432,183 @@
                     </a>
                 </div>
                 
-                {% for rec in reconocimientos %}
-                <div class="recognition-item">
-                    <div class="item-title">{{ rec.nombrereconocimiento }}</div>
-                    {% if rec.otorgadopor %}
-                    <div class="item-subtitle">{{ rec.otorgadopor }}</div>
-                    {% endif %}
-                    <div class="item-date">
-                        <i class="bi bi-calendar3"></i>
-                        {{ rec.fecha|date:"M Y" }}
+                {% if reconocimientos %}
+                    {% for rec in reconocimientos %}
+                    <div class="recognition-item">
+                        <div class="item-title">{{ rec.tiporeconocimiento }}</div>
+                        <div class="item-subtitle">{{ rec.entidadpatrocinadora }}</div>
+                        <div class="item-date">
+                            <i class="bi bi-calendar3"></i>
+                            {{ rec.fechareconocimiento|date:"d \d\e M \d\e Y" }}
+                        </div>
+                        {% if rec.descripcionreconocimiento %}
+                        <div class="item-description">{{ rec.descripcionreconocimiento }}</div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'editar_reconocimiento' rec.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="{% url 'eliminar_reconocimiento' rec.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este reconocimiento?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    {% if rec.descripcion %}
-                    <div class="item-description">{{ rec.descripcion }}</div>
-                    {% endif %}
-                    
-                    <div class="mt-3">
-                        <a href="{% url 'editar_reconocimiento' rec.id %}" class="btn btn-sm btn-outline-primary me-2">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <form method="POST" action="{% url 'eliminar_reconocimiento' rec.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este reconocimiento?')">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </form>
-                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-trophy"></i>
+                    <p>No hay reconocimientos registrados</p>
+                    <a href="{% url 'crear_reconocimiento' %}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Primer Reconocimiento
+                    </a>
                 </div>
-                {% endfor %}
+                {% endif %}
             </div>
-            {% endif %}
+            
+            <!-- Productos Académicos -->
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-book-fill"></i>
+                        Productos Académicos
+                    </h3>
+                    <a href="{% url 'crear_producto_academico' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus"></i> Agregar
+                    </a>
+                </div>
+                
+                {% if productos_academicos %}
+                    {% for prod in productos_academicos %}
+                    <div class="experience-item">
+                        <div class="item-title">{{ prod.nombrerecurso }}</div>
+                        <div class="item-subtitle">{{ prod.clasificador }}</div>
+                        {% if prod.descripcion %}
+                        <div class="item-description">{{ prod.descripcion }}</div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'editar_producto_academico' prod.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="{% url 'eliminar_producto_academico' prod.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este producto?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-book"></i>
+                    <p>No hay productos académicos registrados</p>
+                    <a href="{% url 'crear_producto_academico' %}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Producto Académico
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Productos Laborales -->
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-hammer-fill"></i>
+                        Productos Laborales
+                    </h3>
+                    <a href="{% url 'crear_producto_laboral' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus"></i> Agregar
+                    </a>
+                </div>
+                
+                {% if productos_laborales %}
+                    {% for prod in productos_laborales %}
+                    <div class="experience-item">
+                        <div class="item-title">{{ prod.nombreproducto }}</div>
+                        <div class="item-date">
+                            <i class="bi bi-calendar3"></i>
+                            {{ prod.fechaproducto|date:"d \d\e M \d\e Y" }}
+                        </div>
+                        {% if prod.descripcion %}
+                        <div class="item-description">{{ prod.descripcion }}</div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'editar_producto_laboral' prod.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="{% url 'eliminar_producto_laboral' prod.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este producto?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-hammer"></i>
+                    <p>No hay productos laborales registrados</p>
+                    <a href="{% url 'crear_producto_laboral' %}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Producto Laboral
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Venta de Productos -->
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-bag-fill"></i>
+                        Venta de Productos
+                    </h3>
+                    <a href="{% url 'crear_venta_garage' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus"></i> Agregar
+                    </a>
+                </div>
+                
+                {% if ventas %}
+                    {% for venta in ventas %}
+                    <div class="experience-item">
+                        <div class="item-title">{{ venta.nombreproducto }}</div>
+                        <div class="item-subtitle">Estado: <strong>{{ venta.estadoproducto }}</strong></div>
+                        <div class="item-date">
+                            Valor: <strong>${{ venta.valordelbien }}</strong>
+                        </div>
+                        {% if venta.descripcion %}
+                        <div class="item-description">{{ venta.descripcion }}</div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'editar_venta_garage' venta.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="{% url 'eliminar_venta_garage' venta.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar esta venta?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-bag"></i>
+                    <p>No hay productos en venta</p>
+                    <a href="{% url 'crear_venta_garage' %}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Producto en Venta
+                    </a>
+                </div>
+                {% endif %}
+            </div>
             
         </div>
         
@@ -495,6 +640,21 @@
                 <a href="{% url 'crear_reconocimiento' %}" class="edit-btn text-decoration-none d-block text-center">
                     <i class="bi bi-plus-circle me-2"></i>
                     Agregar Reconocimiento
+                </a>
+                
+                <a href="{% url 'crear_producto_academico' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Producto Académico
+                </a>
+                
+                <a href="{% url 'crear_producto_laboral' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Producto Laboral
+                </a>
+                
+                <a href="{% url 'crear_venta_garage' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Venta de Producto
                 </a>
                 
                 <div class="mt-4 p-3" style="background: #F0FDF4; border-radius: 10px; border-left: 3px solid #10B981;">
