@@ -205,7 +205,7 @@
     <!-- Header con foto y nombre -->
     <div class="cv-header">
         <div class="row align-items-center">
-            <div class="col-auto">
+          <!--  <div class="col-auto">
                 {% if datos.fotoperfil %}
                 <img src="{{ datos.fotoperfil.url }}" alt="Foto de perfil" class="profile-photo" loading="lazy">
                 {% else %}
@@ -213,7 +213,7 @@
                     <i class="bi bi-person-circle" style="font-size: 5rem;"></i>
                 </div>
                 {% endif %}
-            </div>
+            </div> -->
             <div class="col">
                 <h1 class="mb-2" style="font-size: 2.5rem; font-weight: 700;">
                     {{ datos.nombres }} {{ datos.apellidos }}
@@ -225,7 +225,7 @@
                 {% endif %}
                 <div class="mt-2">
                     <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-light">
-                        <i class="bi bi-pencil-square"></i> Editar Foto
+                     <!--   <i class="bi bi-pencil-square"></i> Editar Foto -->
                     </a>
                 </div>
             </div>
