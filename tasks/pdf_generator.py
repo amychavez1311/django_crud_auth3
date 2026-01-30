@@ -493,6 +493,78 @@ class CVPDFGenerator:
             items.append(Spacer(1, 0.12*inch))
             self.story.extend(items)
     
+    def _add_productos_laborales(self):
+        """Añade productos laborales"""
+        productos = self.datos.productos_laborales.filter(activo=True)
+        
+        if not productos.exists():
+            return
+        
+        self._add_section_title("PRODUCTOS LABORALES", "🏆")
+        
+        table_data = [['Producto', 'Fecha']]
+        for prod in productos:
+            fecha_str = prod.fechaproducto.strftime('%d %b %Y') if prod.fechaproducto else 'N/A'
+            table_data.append([
+                prod.nombreproducto,
+                fecha_str
+            ])
+        
+        table = Table(table_data, colWidths=[3.5*inch, 1.5*inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), self.PRIMARY_COLOR),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), self.BACKGROUND),
+            ('GRID', (0, 0), (-1, -1), 0.5, self.LIGHT_TEXT),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F0F4F8')]),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        self.story.append(table)
+        self.story.append(Spacer(1, 0.2*inch))
+    
+    def _add_ventas_garage(self):
+        """Añade ventas de productos"""
+        ventas = self.datos.ventas_garage.filter(activo=True)
+        
+        if not ventas.exists():
+            return
+        
+        self._add_section_title("PRODUCTOS EN VENTA", "💼")
+        
+        table_data = [['Producto', 'Estado', 'Valor']]
+        for venta in ventas:
+            valor_str = f"${venta.valordelbien:,.2f}"
+            table_data.append([
+                venta.nombreproducto,
+                venta.estadoproducto,
+                valor_str
+            ])
+        
+        table = Table(table_data, colWidths=[2.5*inch, 1.5*inch, 1.5*inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), self.PRIMARY_COLOR),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), self.BACKGROUND),
+            ('GRID', (0, 0), (-1, -1), 0.5, self.LIGHT_TEXT),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F0F4F8')]),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        self.story.append(table)
+        self.story.append(Spacer(1, 0.2*inch))
+    
     def _add_footer(self):
         """Añade pie de página profesional"""
         self.story.append(Spacer(1, 0.3*inch))
@@ -549,6 +621,12 @@ class CVPDFGenerator:
             if self.datos.productos_academicos.filter(activo=True).exists():
                 self._add_productos_academicos()
             
+            if self.datos.productos_laborales.filter(activo=True).exists():
+                self._add_productos_laborales()
+            
+            if self.datos.ventas_garage.filter(activo=True).exists():
+                self._add_ventas_garage()
+            
             self._add_footer()
             
             # Construir PDF
@@ -568,6 +646,7 @@ class CVPDFGenerator:
         except Exception as e:
             print(f"Error generando PDF: {e}")
             self._cleanup_temp_files()
+            raise
             return None
     
     def _incrustar_certificados(self, pdf_principal_buffer):

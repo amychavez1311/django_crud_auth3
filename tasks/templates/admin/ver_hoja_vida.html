@@ -59,9 +59,9 @@
                                                 <td>{{ exp.cargodesempenado }}</td>
                                                 <td>{{ exp.nombreempresa }}</td>
                                                 <td>
-                                                    {{ exp.fechainiciogestion|date:"M Y" }}
+                                                    {{ exp.fechainiciogestion|date:"M d, Y" }}
                                                     {% if exp.fechafingestion %}
-                                                        - {{ exp.fechafingestion|date:"M Y" }}
+                                                        - {{ exp.fechafingestion|date:"M d, Y" }}
                                                     {% else %}
                                                         - Presente
                                                     {% endif %}
@@ -129,9 +129,9 @@
                                                 <td>{{ curso.nombrecurso }}</td>
                                                 <td>{{ curso.entidadpatrocinadora }}</td>
                                                 <td>
-                                                    {{ curso.fechainicio|date:"M Y" }}
+                                                    {{ curso.fechainicio|date:"M d, Y" }}
                                                     {% if curso.fechafin %}
-                                                        - {{ curso.fechafin|date:"M Y" }}
+                                                        - {{ curso.fechafin|date:"M d, Y" }}
                                                     {% endif %}
                                                 </td>
                                                 <td>{{ curso.totalhoras|default:"N/A" }}</td>
