@@ -1,32 +1,216 @@
 {% extends 'base.html' %}
+
+{% block title %}Registrarse - CV Manager{% endblock %}
+
 {% block content %}
-    <main class="container">
-        <div class="row">
-            <div class="col-md-4 offset-md-4 mt-5">
-                <form action="/signup/" method="POST" class="card card-body">
-                    <h1  class="text-center">Signup</h1>
-                    {{error}}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="bi bi-person-plus-fill" style="font-size: 3.5rem; color: var(--primary-color);"></i>
+            </div>
+            <h2 class="fw-bold mb-2">Crea tu cuenta</h2>
+            <p class="text-muted">Únete y comienza a crear tu CV profesional</p>
+        </div>
+        
+        <div class="card border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="card-body p-5">
+                <form method="POST" class="needs-validation" novalidate>
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username">Username: </label>
-                        <input type="text" name="username" id="username" class="form-control" placeholder="Write your username">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="bi bi-person-fill me-2 text-primary"></i>Usuario
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-lg" 
+                                id="username" 
+                                name="username" 
+                                required
+                                style="border-radius: 10px; border: 2px solid #E5E7EB; padding: 0.8rem 1.2rem;"
+                                placeholder="Nombre de usuario"
+                            >
+                            <div class="invalid-feedback">
+                                Ingresa un nombre de usuario
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="bi bi-envelope-fill me-2 text-primary"></i>Email
+                            </label>
+                            <input 
+                                type="email" 
+                                class="form-control form-control-lg" 
+                                id="email" 
+                                name="email" 
+                                required
+                                style="border-radius: 10px; border: 2px solid #E5E7EB; padding: 0.8rem 1.2rem;"
+                                placeholder="tu@email.com"
+                            >
+                            <div class="invalid-feedback">
+                                Ingresa un email válido
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="password1">password: </label>
-                        <input type="password" name="password1" id="password1" class="form-control" placeholder="Write your password">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="password1" class="form-label fw-semibold">
+                                <i class="bi bi-lock-fill me-2 text-primary"></i>Contraseña
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-lg" 
+                                id="password1" 
+                                name="password1" 
+                                required
+                                minlength="8"
+                                style="border-radius: 10px; border: 2px solid #E5E7EB; padding: 0.8rem 1.2rem;"
+                                placeholder="Mínimo 8 caracteres"
+                            >
+                            <div class="invalid-feedback">
+                                Mínimo 8 caracteres
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <label for="password2" class="form-label fw-semibold">
+                                <i class="bi bi-lock-fill me-2 text-primary"></i>Confirmar
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-lg" 
+                                id="password2" 
+                                name="password2" 
+                                required
+                                minlength="8"
+                                style="border-radius: 10px; border: 2px solid #E5E7EB; padding: 0.8rem 1.2rem;"
+                                placeholder="Repite tu contraseña"
+                            >
+                            <div class="invalid-feedback">
+                                Las contraseñas deben coincidir
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="password2">Confirm your Password: </label>
-                        <input type="password" name="password2" id="password2" class="form-control" placeholder="Confirm your password">
+                    
+                    <!-- Mostrar errores del formulario si existen -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                {{ error }}<br>
+                            {% endfor %}
+                        {% endfor %}
                     </div>
-
-                    <button>
-                        Signup
-                    </button>
+                    {% endif %}
+                    
+                    <div class="d-grid mb-4">
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary btn-lg"
+                            style="border-radius: 10px; padding: 0.8rem; font-weight: 600;"
+                        >
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Crear Cuenta
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            ¿Ya tienes una cuenta? 
+                            <a href="/signin/" class="fw-bold" style="color: var(--primary-color); text-decoration: none;">
+                                Inicia sesión aquí
+                            </a>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
-    </main>
+        
+        <!-- Características -->
+        <div class="row mt-4 g-3">
+            <div class="col-md-4">
+                <div class="text-center p-3" style="background: #ECFDF5; border-radius: 12px;">
+                    <i class="bi bi-shield-check" style="font-size: 2rem; color: #10B981;"></i>
+                    <p class="small mb-0 mt-2 fw-semibold" style="color: #065F46;">100% Gratis</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-3" style="background: #EFF6FF; border-radius: 12px;">
+                    <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; color: #3B82F6;"></i>
+                    <p class="small mb-0 mt-2 fw-semibold" style="color: #1E40AF;">Rápido y Fácil</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-3" style="background: #FEF3C7; border-radius: 12px;">
+                    <i class="bi bi-star-fill" style="font-size: 2rem; color: #F59E0B;"></i>
+                    <p class="small mb-0 mt-2 fw-semibold" style="color: #92400E;">Profesional</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validación de formulario
+(function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            const password1 = document.getElementById('password1');
+            const password2 = document.getElementById('password2');
+            
+            // Validar que las contraseñas coincidan
+            if (password1.value !== password2.value) {
+                password2.setCustomValidity('Las contraseñas no coinciden');
+            } else {
+                password2.setCustomValidity('');
+            }
+            
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+        
+        // Validar en tiempo real
+        document.getElementById('password2').addEventListener('input', function() {
+            const password1 = document.getElementById('password1');
+            if (this.value !== password1.value) {
+                this.setCustomValidity('Las contraseñas no coinciden');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    });
+})();
+</script>
+
+<style>
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.15);
+    }
+    
+    .card {
+        animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock %}

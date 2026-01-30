@@ -1,96 +1,341 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Django CRUD Application</title>
-        <!-- Bootstrap CSS (CDN) -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-        <!-- Bootstrap Icons -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-        <!-- Local stylesheet (overrides) -->
-    <link rel="stylesheet" href="{% static 'tasks/css/style.css' %}">
+    <title>{% block title %}CV Manager - Profesional{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary-color: #10B981;
+            --accent-color: #F59E0B;
+            --dark-bg: #1F2937;
+            --light-bg: #F9FAFB;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 15px 40px rgba(79, 70, 229, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1F2937;
+        }
+        
+        /* Navbar moderna */
+        .modern-navbar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+        }
+        
+        .modern-navbar .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .modern-navbar .nav-link {
+            color: #4B5563;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .modern-navbar .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.05);
+        }
+        
+        .modern-navbar .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+        }
+        
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            margin: 0.2rem 0;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        /* Main Content */
+        .site-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            padding: 2.5rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Alerts mejorados */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            animation: slideInDown 0.4s ease;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            color: #065F46;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+            color: #991B1B;
+            border-left: 4px solid #EF4444;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+            color: #92400E;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+            color: #1E40AF;
+            border-left: 4px solid #3B82F6;
+        }
+        
+        /* Botones modernos */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #7C3AED);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
+            border: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Admin badge */
+        .admin-link {
+            color: var(--accent-color) !important;
+            font-weight: 600;
+        }
+        
+        .badge-admin {
+            background: linear-gradient(135deg, #FEF3C7, #FCD34D);
+            color: #92400E;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .site-content {
+                padding: 1.5rem;
+                margin: 1rem;
+                border-radius: 15px;
+            }
+            
+            .modern-navbar .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     
-        <nav class="navbar navbar-expand-lg site-navbar">
-        <div class="container-fluid">
-                    <a class="navbar-brand site-brand" href="/">Django App</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav  ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                
-                {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg modern-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-briefcase-fill"></i> CV Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks' %}">Tasks Pending</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks_completed' %}">Tasks completed</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/tasks/create/">Create Task</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="/hoja-vida/" id="cvDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-file-earmark"></i> Mi Hoja de Vida
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house-fill"></i> Inicio
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="cvDropdown">
-                            <li><a class="dropdown-item" href="{% url 'mi_hoja_vida' %}">Ver Mi CV</a></li>
-                            <li><a class="dropdown-item" href="{% url 'crear_datos_personales' %}">Editar Datos Personales</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'descargar_cv_pdf' %}">Descargar CV en PDF</a></li>
-                        </ul>
                     </li>
-                    {% if user.is_staff %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-warning" href="/admin-panel/hojas-vida/" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-shield-lock"></i> Admin
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                            <li><a class="dropdown-item" href="{% url 'admin_hojas_vida' %}">Hojas de Vida</a></li>
-                            <li><a class="dropdown-item" href="/admin/">Panel Django Admin</a></li>
-                        </ul>
-                    </li>
+                    
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'tasks' %}">
+                                <i class="bi bi-clock-history"></i> Pendientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'tasks_completed' %}">
+                                <i class="bi bi-check-circle-fill"></i> Completadas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/tasks/create/">
+                                <i class="bi bi-plus-circle-fill"></i> Nueva Tarea
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="cvDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-file-earmark-person"></i> Mi CV
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'mi_hoja_vida' %}">
+                                    <i class="bi bi-eye"></i> Ver Mi CV
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'crear_datos_personales' %}">
+                                    <i class="bi bi-pencil-square"></i> Editar Datos
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'descargar_cv_pdf' %}">
+                                    <i class="bi bi-download"></i> Descargar PDF
+                                </a></li>
+                            </ul>
+                        </li>
+                        
+                        {% if user.is_staff %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle admin-link" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-shield-lock-fill"></i> Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'admin_hojas_vida' %}">
+                                    <i class="bi bi-people"></i> Hojas de Vida
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin/">
+                                    <i class="bi bi-gear-fill"></i> Panel Admin
+                                </a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">
+                                <i class="bi bi-box-arrow-right"></i> Salir
+                            </a>
+                        </li>
+                    {% else %}    
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signup">
+                                <i class="bi bi-person-plus-fill"></i> Registrarse
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                            </a>
+                        </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
-                    </li>
-                {% else %}    
-                    <li>
-                        <a class="nav-link" href="/signup">Signup</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/signin">Signin</a>
-                    </li>
-                {% endif %}
-                        </ul>
-          </div>
+                </ul>
+            </div>
         </div>
     </nav>
 
     {% if messages %}
-        <div class="container mt-3">
+        <div class="container mt-4">
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'danger' %}exclamation-triangle-fill{% elif message.tags == 'warning' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %} me-2"></i>
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <main class="site-content container my-5">
+    <main class="site-content">
         {% block content %}
         {% endblock %}
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWbSxccPQtF3EpF3fnJHog6LaEVF6d1uEXg1Ry7b6n0K6xonpm" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

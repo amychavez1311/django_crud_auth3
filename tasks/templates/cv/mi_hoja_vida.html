@@ -1,367 +1,507 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Mi Curriculum Vitae{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cv-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .cv-header {
+        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+        color: white;
+        padding: 2.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(79, 70, 229, 0.3);
+    }
+    
+    .profile-photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #4F46E5;
+        transition: all 0.3s ease;
+    }
+    
+    .section-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        color: #4F46E5;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-title i {
+        font-size: 1.8rem;
+    }
+    
+    .experience-item, .course-item, .recognition-item {
+        padding: 1.5rem;
+        background: #F9FAFB;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        border-left: 3px solid #10B981;
+    }
+    
+    .experience-item:hover, .course-item:hover, .recognition-item:hover {
+        background: #EEF2FF;
+        border-left-color: #4F46E5;
+        transform: translateX(5px);
+    }
+    
+    .item-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1F2937;
+        margin-bottom: 0.3rem;
+    }
+    
+    .item-subtitle {
+        color: #6B7280;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .item-date {
+        color: #9CA3AF;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .item-description {
+        color: #4B5563;
+        margin-top: 0.8rem;
+        line-height: 1.6;
+    }
+    
+    .badge-custom {
+        background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+        color: #065F46;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #9CA3AF;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+    
+    .action-buttons {
+        position: sticky;
+        top: 100px;
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .download-btn {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        width: 100%;
+        margin-bottom: 0.8rem;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+    
+    .edit-btn {
+        background: #F3F4F6;
+        color: #4B5563;
+        padding: 0.8rem 2rem;
+        border-radius: 10px;
+        border: 2px solid #E5E7EB;
+        font-weight: 600;
+        width: 100%;
+        margin-bottom: 0.8rem;
+        transition: all 0.3s ease;
+    }
+    
+    .edit-btn:hover {
+        background: #4F46E5;
+        color: white;
+        border-color: #4F46E5;
+        transform: translateY(-2px);
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: start;
+        gap: 0.8rem;
+    }
+    
+    .info-item i {
+        color: #4F46E5;
+        font-size: 1.2rem;
+        margin-top: 0.2rem;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6B7280;
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .info-value {
+        color: #1F2937;
+        font-size: 0.95rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">Mi Hoja de Vida</h2>
+<div class="cv-container">
+    <!-- Header con foto y nombre -->
+    <div class="cv-header">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                {% if datos.fotoperfil %}
+                <img src="{{ datos.fotoperfil.url }}" alt="Foto de perfil" class="profile-photo">
+                {% else %}
+                <div class="profile-photo d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.2);">
+                    <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
                 </div>
-                <div class="card-body">
+                {% endif %}
+            </div>
+            <div class="col">
+                <h1 class="mb-2" style="font-size: 2.5rem; font-weight: 700;">
+                    {{ datos.nombres }} {{ datos.apellidos }}
+                </h1>
+                {% if datos.descripcionperfil %}
+                <p class="mb-0" style="font-size: 1.1rem; opacity: 0.9;">
+                    {{ datos.descripcionperfil }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Columna principal -->
+        <div class="col-lg-8">
+            
+            <!-- Datos Personales -->
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-person-badge-fill"></i>
+                        Información Personal
+                    </h3>
+                    <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                </div>
+                
+                <div class="info-grid">
+                    {% if user.email %}
+                    <div class="info-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <div>
+                            <div class="info-label">Email</div>
+                            <div class="info-value">{{ user.email }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
                     
-                    <!-- Información Personal -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Datos Personales</h3>
-                            <a href="{% url 'crear_datos_personales' %}" class="btn btn-sm btn-primary">
+                    {% if datos.telefonoconvencional %}
+                    <div class="info-item">
+                        <i class="bi bi-phone-fill"></i>
+                        <div>
+                            <div class="info-label">Teléfono</div>
+                            <div class="info-value">{{ datos.telefonoconvencional }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if datos.ciudad %}
+                    <div class="info-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <div>
+                            <div class="info-label">Ubicación</div>
+                            <div class="info-value">{{ datos.ciudad }}, {{ datos.pais|default:"Ecuador" }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if datos.sitioweb %}
+                    <div class="info-item">
+                        <i class="bi bi-globe"></i>
+                        <div>
+                            <div class="info-label">Sitio Web</div>
+                            <div class="info-value">
+                                <a href="{{ datos.sitioweb }}" target="_blank">{{ datos.sitioweb }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if datos.cedula %}
+                    <div class="info-item">
+                        <i class="bi bi-card-text"></i>
+                        <div>
+                            <div class="info-label">Cédula</div>
+                            <div class="info-value">{{ datos.cedula }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if datos.fechanacimiento %}
+                    <div class="info-item">
+                        <i class="bi bi-calendar-event"></i>
+                        <div>
+                            <div class="info-label">Fecha de Nacimiento</div>
+                            <div class="info-value">{{ datos.fechanacimiento|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Experiencia Laboral -->
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-briefcase-fill"></i>
+                        Experiencia Profesional
+                    </h3>
+                    <a href="{% url 'crear_experiencia_laboral' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus"></i> Agregar
+                    </a>
+                </div>
+                
+                {% if experiencias %}
+                    {% for exp in experiencias %}
+                    <div class="experience-item">
+                        <div class="item-title">{{ exp.cargo }}</div>
+                        <div class="item-subtitle">{{ exp.empresa }}</div>
+                        <div class="item-date">
+                            <i class="bi bi-calendar3"></i>
+                            {{ exp.fecha_inicio|date:"M Y" }}
+                            {% if exp.fecha_fin %}
+                                - {{ exp.fecha_fin|date:"M Y" }}
+                            {% else %}
+                                - Presente
+                            {% endif %}
+                        </div>
+                        {% if exp.descripcion %}
+                        <div class="item-description">{{ exp.descripcion }}</div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'editar_experiencia_laboral' exp.id %}" class="btn btn-sm btn-outline-primary me-2">
                                 <i class="bi bi-pencil"></i> Editar
                             </a>
+                            <form method="POST" action="{% url 'eliminar_experiencia_laboral' exp.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar esta experiencia?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Nombre:</strong> {{ datos.nombres }} {{ datos.apellidos }}</p>
-                                <p><strong>Cédula:</strong> {{ datos.numerocedula }}</p>
-                                <p><strong>Nacionalidad:</strong> {{ datos.nacionalidad }}</p>
-                                <p><strong>Sexo:</strong> {{ datos.get_sexo_display }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Email:</strong> {{ user.email }}</p>
-                                <p><strong>Teléfono Convencional:</strong> {{ datos.telefonoconvencional }}</p>
-                                <p><strong>Teléfono Fijo:</strong> {{ datos.telefonofijo }}</p>
-                                <p><strong>Sitio Web:</strong> 
-                                    {% if datos.sitioweb %}
-                                        <a href="{{ datos.sitioweb }}" target="_blank">{{ datos.sitioweb }}</a>
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                        {% if datos.descripcionperfil %}
-                            <p><strong>Descripción del Perfil:</strong> {{ datos.descripcionperfil }}</p>
-                        {% endif %}
                     </div>
-
-                    <hr>
-
-                    <!-- Experiencia Laboral -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Experiencia Laboral</h3>
-                            <a href="{% url 'crear_experiencia_laboral' %}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-
-                        {% if experiencias %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Cargo</th>
-                                            <th>Empresa</th>
-                                            <th>Período</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for exp in experiencias %}
-                                            <tr>
-                                                <td>{{ exp.cargodesempenado }}</td>
-                                                <td>{{ exp.nombreempresa }}</td>
-                                                <td>
-                                                    {{ exp.fechainiciogestion|date:"M Y" }}
-                                                    {% if exp.fechafingestion %}
-                                                        - {{ exp.fechafingestion|date:"M Y" }}
-                                                    {% else %}
-                                                        - Presente
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="{% url 'editar_experiencia_laboral' exp.id %}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form method="POST" action="{% url 'eliminar_experiencia_laboral' exp.id %}" style="display:inline;">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">No hay experiencias laborales registradas. <a href="{% url 'crear_experiencia_laboral' %}">Agregar una</a></p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Reconocimientos -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Reconocimientos</h3>
-                            <a href="{% url 'crear_reconocimiento' %}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-
-                        {% if reconocimientos %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Tipo</th>
-                                            <th>Entidad</th>
-                                            <th>Fecha</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for reco in reconocimientos %}
-                                            <tr>
-                                                <td>{{ reco.get_tiporeconocimiento_display }}</td>
-                                                <td>{{ reco.entidadpatrocinadora }}</td>
-                                                <td>{{ reco.fechareconocimiento|date:"d M Y" }}</td>
-                                                <td>
-                                                    <a href="{% url 'editar_reconocimiento' reco.id %}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form method="POST" action="{% url 'eliminar_reconocimiento' reco.id %}" style="display:inline;">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">No hay reconocimientos registrados. <a href="{% url 'crear_reconocimiento' %}">Agregar uno</a></p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Cursos -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Cursos y Capacitaciones</h3>
-                            <a href="{% url 'crear_curso' %}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-
-                        {% if cursos %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Curso</th>
-                                            <th>Entidad</th>
-                                            <th>Período</th>
-                                            <th>Horas</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for curso in cursos %}
-                                            <tr>
-                                                <td>{{ curso.nombrecurso }}</td>
-                                                <td>{{ curso.entidadpatrocinadora }}</td>
-                                                <td>
-                                                    {{ curso.fechainicio|date:"M Y" }}
-                                                    {% if curso.fechafin %}
-                                                        - {{ curso.fechafin|date:"M Y" }}
-                                                    {% endif %}
-                                                </td>
-                                                <td>{{ curso.totalhoras|default:"N/A" }}</td>
-                                                <td>
-                                                    <a href="{% url 'editar_curso' curso.id %}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form method="POST" action="{% url 'eliminar_curso' curso.id %}" style="display:inline;">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">No hay cursos registrados. <a href="{% url 'crear_curso' %}">Agregar uno</a></p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Productos Académicos -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Productos Académicos</h3>
-                            <a href="{% url 'crear_producto_academico' %}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-
-                        {% if productos_academicos %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Recurso</th>
-                                            <th>Clasificador</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for prod in productos_academicos %}
-                                            <tr>
-                                                <td>{{ prod.nombrerecurso }}</td>
-                                                <td>{{ prod.clasificador }}</td>
-                                                <td>
-                                                    <a href="{% url 'editar_producto_academico' prod.id %}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form method="POST" action="{% url 'eliminar_producto_academico' prod.id %}" style="display:inline;">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">No hay productos académicos registrados. <a href="{% url 'crear_producto_academico' %}">Agregar uno</a></p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Productos Laborales -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Productos Laborales</h3>
-                            <a href="{% url 'crear_producto_laboral' %}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-
-                        {% if productos_laborales %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Fecha</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for prod in productos_laborales %}
-                                            <tr>
-                                                <td>{{ prod.nombreproducto }}</td>
-                                                <td>{{ prod.fechaproducto|date:"d M Y" }}</td>
-                                                <td>
-                                                    <a href="{% url 'editar_producto_laboral' prod.id %}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form method="POST" action="{% url 'eliminar_producto_laboral' prod.id %}" style="display:inline;">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">No hay productos laborales registrados. <a href="{% url 'crear_producto_laboral' %}">Agregar uno</a></p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Ventas Garage -->
-                    <div class="section mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 class="text-primary">Venta de Productos</h3>
-                            <a href="{% url 'crear_venta_garage' %}" class="btn btn-sm btn-success">
-                                <i class="bi bi-plus"></i> Agregar
-                            </a>
-                        </div>
-
-                        {% if ventas %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Estado</th>
-                                            <th>Valor</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for venta in ventas %}
-                                            <tr>
-                                                <td>{{ venta.nombreproducto }}</td>
-                                                <td>
-                                                    <span class="badge bg-{% if venta.estadoproducto == 'Bueno' %}success{% else %}warning{% endif %}">
-                                                        {{ venta.estadoproducto }}
-                                                    </span>
-                                                </td>
-                                                <td>${{ venta.valordelbien }}</td>
-                                                <td>
-                                                    <a href="{% url 'editar_venta_garage' venta.id %}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <form method="POST" action="{% url 'eliminar_venta_garage' venta.id %}" style="display:inline;">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">No hay productos en venta. <a href="{% url 'crear_venta_garage' %}">Agregar uno</a></p>
-                        {% endif %}
-                    </div>
-
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-briefcase"></i>
+                    <p>No hay experiencias laborales registradas</p>
+                    <a href="{% url 'crear_experiencia_laboral' %}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Primera Experiencia
+                    </a>
                 </div>
-
-                <div class="card-footer d-flex justify-content-between">
-                    <a href="{% url 'visualizar_cv_pdf' %}" class="btn btn-primary">
-                        <i class="bi bi-eye"></i> Ver CV en PDF
+                {% endif %}
+            </div>
+            
+            <!-- Cursos y Certificaciones -->
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-mortarboard-fill"></i>
+                        Formación y Certificaciones
+                    </h3>
+                    <a href="{% url 'crear_curso' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus"></i> Agregar
                     </a>
-                    <a href="{% url 'descargar_cv_pdf' %}" class="btn btn-success">
-                        <i class="bi bi-download"></i> Descargar CV
+                </div>
+                
+                {% if cursos %}
+                    {% for curso in cursos %}
+                    <div class="course-item">
+                        <div class="item-title">{{ curso.nombrecurso }}</div>
+                        {% if curso.institucion %}
+                        <div class="item-subtitle">{{ curso.institucion }}</div>
+                        {% endif %}
+                        <div class="item-date">
+                            <i class="bi bi-calendar3"></i>
+                            {{ curso.fecha_inicio|date:"M Y" }}
+                            {% if curso.fecha_fin %} - {{ curso.fecha_fin|date:"M Y" }}{% endif %}
+                            {% if curso.totalhoras %} | {{ curso.totalhoras }} horas{% endif %}
+                        </div>
+                        {% if curso.descripcioncurso %}
+                        <div class="item-description">{{ curso.descripcioncurso }}</div>
+                        {% endif %}
+                        {% if curso.certificado %}
+                        <div class="mt-2">
+                            <span class="badge-custom">
+                                <i class="bi bi-file-earmark-pdf"></i> Certificado adjunto
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'editar_curso' curso.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="{% url 'eliminar_curso' curso.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este curso?')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-mortarboard"></i>
+                    <p>No hay cursos registrados</p>
+                    <a href="{% url 'crear_curso' %}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Primer Curso
                     </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Reconocimientos -->
+            {% if reconocimientos %}
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="section-title mb-0">
+                        <i class="bi bi-trophy-fill"></i>
+                        Reconocimientos y Logros
+                    </h3>
+                    <a href="{% url 'crear_reconocimiento' %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus"></i> Agregar
+                    </a>
+                </div>
+                
+                {% for rec in reconocimientos %}
+                <div class="recognition-item">
+                    <div class="item-title">{{ rec.nombrereconocimiento }}</div>
+                    {% if rec.otorgadopor %}
+                    <div class="item-subtitle">{{ rec.otorgadopor }}</div>
+                    {% endif %}
+                    <div class="item-date">
+                        <i class="bi bi-calendar3"></i>
+                        {{ rec.fecha|date:"M Y" }}
+                    </div>
+                    {% if rec.descripcion %}
+                    <div class="item-description">{{ rec.descripcion }}</div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'editar_reconocimiento' rec.id %}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <form method="POST" action="{% url 'eliminar_reconocimiento' rec.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este reconocimiento?')">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+        </div>
+        
+        <!-- Sidebar con acciones -->
+        <div class="col-lg-4">
+            <div class="action-buttons">
+                <h5 class="mb-3 fw-bold" style="color: #4F46E5;">Acciones Rápidas</h5>
+                
+                <a href="{% url 'descargar_cv_pdf' %}" class="download-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-download me-2"></i>
+                    Descargar CV en PDF
+                </a>
+                
+                <a href="{% url 'crear_datos_personales' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-pencil me-2"></i>
+                    Editar Datos Personales
+                </a>
+                
+                <a href="{% url 'crear_experiencia_laboral' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Experiencia
+                </a>
+                
+                <a href="{% url 'crear_curso' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Curso
+                </a>
+                
+                <a href="{% url 'crear_reconocimiento' %}" class="edit-btn text-decoration-none d-block text-center">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Agregar Reconocimiento
+                </a>
+                
+                <div class="mt-4 p-3" style="background: #F0FDF4; border-radius: 10px; border-left: 3px solid #10B981;">
+                    <p class="small mb-0" style="color: #065F46;">
+                        <i class="bi bi-lightbulb-fill me-2"></i>
+                        <strong>Consejo:</strong> Mantén tu CV actualizado para mejores oportunidades laborales.
+                    </p>
                 </div>
             </div>
         </div>

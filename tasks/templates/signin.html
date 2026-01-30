@@ -1,32 +1,133 @@
 {% extends 'base.html' %}
 
+{% block title %}Iniciar Sesión - CV Manager{% endblock %}
+
 {% block content %}
-
-<main class="container">
-    <div class="row">
-        <section class="col-md-4 offset-md-4 mt-5">
-            <form action="/signin/" method="POST" class="card card-body">
-           
-                <h1  class="text-center">Signin</h1>
-                {{error}}
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="username">Username: </label>
-                    <input type="text" name="username" id="username" class="form-control" placeholder="Write your username">
-                </div>
-            
-                <div class="mb-3">
-                    <label for="password">password: </label>
-                    <input type="password" name="password" id="password" class="form-control" placeholder="Write your password">
-                </div>
-            
-                <button class="btn btn-primary">
-                    Signin
-                </button>
-            </form>
-        </section>
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="bi bi-box-arrow-in-right" style="font-size: 3.5rem; color: var(--primary-color);"></i>
+            </div>
+            <h2 class="fw-bold mb-2">¡Bienvenido de vuelta!</h2>
+            <p class="text-muted">Inicia sesión para gestionar tu CV profesional</p>
+        </div>
+        
+        <div class="card border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="card-body p-5">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="username" class="form-label fw-semibold">
+                            <i class="bi bi-person-fill me-2 text-primary"></i>Nombre de usuario
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-lg" 
+                            id="username" 
+                            name="username" 
+                            required
+                            style="border-radius: 10px; border: 2px solid #E5E7EB; padding: 0.8rem 1.2rem;"
+                            placeholder="Ingresa tu usuario"
+                        >
+                        <div class="invalid-feedback">
+                            Por favor ingresa tu nombre de usuario
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-semibold">
+                            <i class="bi bi-lock-fill me-2 text-primary"></i>Contraseña
+                        </label>
+                        <input 
+                            type="password" 
+                            class="form-control form-control-lg" 
+                            id="password" 
+                            name="password" 
+                            required
+                            style="border-radius: 10px; border: 2px solid #E5E7EB; padding: 0.8rem 1.2rem;"
+                            placeholder="Ingresa tu contraseña"
+                        >
+                        <div class="invalid-feedback">
+                            Por favor ingresa tu contraseña
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mb-4">
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary btn-lg"
+                            style="border-radius: 10px; padding: 0.8rem; font-weight: 600;"
+                        >
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Iniciar Sesión
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            ¿No tienes una cuenta? 
+                            <a href="/signup/" class="fw-bold" style="color: var(--primary-color); text-decoration: none;">
+                                Regístrate aquí
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Mensaje de beneficios -->
+        <div class="mt-4 p-4" style="background: linear-gradient(135deg, #EEF2FF, #E0E7FF); border-radius: 15px;">
+            <h6 class="fw-bold mb-3" style="color: #4338CA;">
+                <i class="bi bi-star-fill me-2"></i>Beneficios de tu cuenta
+            </h6>
+            <ul class="small mb-0" style="color: #4F46E5; line-height: 2;">
+                <li>Crea y edita tu CV profesional</li>
+                <li>Descarga en PDF de alta calidad</li>
+                <li>Gestiona tu experiencia laboral</li>
+                <li>Guarda tus certificaciones</li>
+            </ul>
+        </div>
     </div>
-</main>
+</div>
 
+<script>
+// Validación de formulario
+(function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
+
+<style>
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.15);
+    }
+    
+    .card {
+        animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock %}
-

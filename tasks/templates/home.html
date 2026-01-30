@@ -1,18 +1,106 @@
 {% extends 'base.html' %}
+
+{% block title %}Inicio - CV Manager Profesional{% endblock %}
+
 {% block content %}
-<main class="container py-5">
-    <section class="card card-body">
-        <h1 class="display-1 text-center">Django App</h1>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, officia quas neque sit distinctio et iste quae autem voluptatibus deserunt blanditiis amet ipsa, eligendi dolorum quibusdam! Assumenda veniam officia odit.
-    <div class="text-center">
-        <a class="btn btn-secondary" href="/signin/">
-            Signin
+<div class="text-center py-5">
+    <!-- Hero Section -->
+    <div class="mb-5">
+        <div class="mb-4">
+            <i class="bi bi-briefcase-fill" style="font-size: 4rem; color: var(--primary-color);"></i>
+        </div>
+        <h1 class="display-3 fw-bold mb-3" style="background: linear-gradient(135deg, #4F46E5, #7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Crea tu CV Profesional
+        </h1>
+        <p class="lead text-muted mb-4" style="max-width: 600px; margin: 0 auto;">
+            Gestiona tu currículum vitae de forma profesional y descárgalo en PDF con un diseño moderno y elegante.
+        </p>
+    </div>
+    
+    <!-- Features Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="feature-card p-4 h-100" style="background: linear-gradient(135deg, #EEF2FF, #E0E7FF); border-radius: 15px;">
+                <div class="mb-3">
+                    <i class="bi bi-file-earmark-text-fill" style="font-size: 3rem; color: #4F46E5;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Diseño Profesional</h5>
+                <p class="text-muted small">CV con diseño moderno y optimizado para sistemas ATS</p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card p-4 h-100" style="background: linear-gradient(135deg, #ECFDF5, #D1FAE5); border-radius: 15px;">
+                <div class="mb-3">
+                    <i class="bi bi-download" style="font-size: 3rem; color: #10B981;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Descarga en PDF</h5>
+                <p class="text-muted small">Exporta tu CV en formato PDF de alta calidad</p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card p-4 h-100" style="background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border-radius: 15px;">
+                <div class="mb-3">
+                    <i class="bi bi-pencil-square" style="font-size: 3rem; color: #F59E0B;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Fácil Edición</h5>
+                <p class="text-muted small">Actualiza tu información de manera rápida y sencilla</p>
+            </div>
+        </div>
+    </div>
+    
+    {% if user.is_authenticated %}
+    <!-- Usuario autenticado -->
+    <div class="alert alert-success d-inline-block px-5 py-3" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>¡Bienvenido, {{ user.username }}!</strong>
+        <p class="mb-0 mt-2 small">Comienza a gestionar tu CV profesional</p>
+    </div>
+    
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg px-5 py-3 me-3" href="{% url 'mi_hoja_vida' %}" style="border-radius: 12px;">
+            <i class="bi bi-eye me-2"></i> Ver Mi CV
         </a>
-        <a class="btn btn-dark" href="/signup/">
-            Singnup
+        <a class="btn btn-outline-primary btn-lg px-5 py-3" href="{% url 'crear_datos_personales' %}" style="border-radius: 12px;">
+            <i class="bi bi-pencil me-2"></i> Editar Datos
         </a>
     </div>
-    </section>
-</main>
-{% endblock %}
+    
+    {% else %}
+    <!-- Usuario no autenticado -->
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg px-5 py-3 me-3" href="/signin/" style="border-radius: 12px;">
+            <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
+        </a>
+        <a class="btn btn-outline-primary btn-lg px-5 py-3" href="/signup/" style="border-radius: 12px;">
+            <i class="bi bi-person-plus me-2"></i> Registrarse
+        </a>
+    </div>
+    
+    <p class="text-muted small mt-4">
+        ¿Nuevo aquí? Regístrate gratis y comienza a crear tu CV profesional
+    </p>
+    {% endif %}
+</div>
 
+<style>
+    .feature-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

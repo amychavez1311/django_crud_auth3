@@ -1,109 +1,172 @@
 """
-Generador de PDFs de hojas de vida usando ReportLab
-Incluye referencias a certificados en el PDF
+Generador PROFESIONAL de PDFs para CV
+Diseño moderno, elegante y ATS-friendly
 """
 
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+from reportlab.lib.units import inch, mm
+from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle, Paragraph, 
+                                Spacer, PageBreak, Image, HRFlowable, KeepTogether)
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
+from reportlab.pdfgen import canvas
 from datetime import datetime
 from io import BytesIO
 import os
 from PyPDF2 import PdfMerger, PdfReader, PdfWriter
 import tempfile
 from django.core.files.storage import default_storage
-from django.conf import settings
 
 
 class CVPDFGenerator:
-    """Generador de PDFs para hojas de vida con ReportLab"""
+    """Generador de PDFs profesionales para CV con diseño moderno"""
+    
+    # Paleta de colores profesional
+    PRIMARY_COLOR = colors.HexColor('#2563EB')  # Azul profesional
+    SECONDARY_COLOR = colors.HexColor('#64748B')  # Gris azulado
+    ACCENT_COLOR = colors.HexColor('#10B981')  # Verde elegante
+    DARK_TEXT = colors.HexColor('#1E293B')  # Casi negro
+    LIGHT_TEXT = colors.HexColor('#64748B')  # Gris claro
+    BACKGROUND = colors.HexColor('#F8FAFC')  # Fondo suave
     
     def __init__(self, datos_personales):
         self.datos = datos_personales
         self.user = datos_personales.user
         self.story = []
         self.styles = getSampleStyleSheet()
-        self.certificados_para_incrustar = []  # Lista de PDFs a incrustar
-        self.temp_files = []  # Lista de archivos temporales para limpiar
-        self._create_custom_styles()
+        self.certificados_para_incrustar = []
+        self.temp_files = []
+        self._create_modern_styles()
     
-    def _create_custom_styles(self):
-        """Crea estilos personalizados para el PDF"""
-        # Estilo para títulos de secciones
+    def _create_modern_styles(self):
+        """Crea estilos modernos y profesionales"""
+        
+        # Nombre principal - Grande y elegante
         self.styles.add(ParagraphStyle(
-            name='SectionTitle',
-            parent=self.styles['Heading1'],
-            fontSize=14,
-            textColor=colors.HexColor('#1a5490'),
-            spaceAfter=12,
-            spaceBefore=12,
-            borderBottom=1,
-            borderColor=colors.HexColor('#1a5490'),
-            paddingBottom=6
+            name='MainName',
+            parent=self.styles['Title'],
+            fontSize=28,
+            textColor=self.DARK_TEXT,
+            fontName='Helvetica-Bold',
+            alignment=TA_LEFT,
+            spaceAfter=4,
+            leading=32
         ))
         
-        # Estilo para subtítulos
+        # Título profesional
         self.styles.add(ParagraphStyle(
-            name='SubTitle',
+            name='ProfessionalTitle',
+            parent=self.styles['Normal'],
+            fontSize=14,
+            textColor=self.PRIMARY_COLOR,
+            fontName='Helvetica-Bold',
+            spaceAfter=12,
+            leading=16
+        ))
+        
+        # Títulos de sección - Modernos con barra lateral
+        self.styles.add(ParagraphStyle(
+            name='ModernSection',
+            parent=self.styles['Heading1'],
+            fontSize=16,
+            textColor=self.PRIMARY_COLOR,
+            fontName='Helvetica-Bold',
+            spaceAfter=8,
+            spaceBefore=20,
+            leftIndent=0,
+            leading=20
+        ))
+        
+        # Subtítulos de posición/empresa
+        self.styles.add(ParagraphStyle(
+            name='JobTitle',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            textColor=self.DARK_TEXT,
+            fontName='Helvetica-Bold',
+            spaceAfter=3,
+            leading=14
+        ))
+        
+        # Empresa/Institución
+        self.styles.add(ParagraphStyle(
+            name='Company',
             parent=self.styles['Normal'],
             fontSize=11,
-            textColor=colors.HexColor('#333333'),
-            spaceAfter=6,
-            bold=True
+            textColor=self.SECONDARY_COLOR,
+            fontName='Helvetica-Oblique',
+            spaceAfter=4,
+            leading=13
         ))
         
-        # Estilo para texto normal
+        # Fechas
         self.styles.add(ParagraphStyle(
-            name='NormalText',
+            name='DateStyle',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            textColor=self.LIGHT_TEXT,
+            fontName='Helvetica',
+            spaceAfter=6,
+            leading=11
+        ))
+        
+        # Texto descriptivo
+        self.styles.add(ParagraphStyle(
+            name='Description',
             parent=self.styles['Normal'],
             fontSize=10,
-            textColor=colors.HexColor('#555555'),
-            alignment=TA_JUSTIFY
+            textColor=self.DARK_TEXT,
+            fontName='Helvetica',
+            alignment=TA_JUSTIFY,
+            spaceAfter=10,
+            leading=13,
+            leftIndent=0
+        ))
+        
+        # Información de contacto
+        self.styles.add(ParagraphStyle(
+            name='ContactInfo',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            textColor=self.SECONDARY_COLOR,
+            fontName='Helvetica',
+            spaceAfter=2,
+            leading=12
+        ))
+        
+        # Etiquetas/badges
+        self.styles.add(ParagraphStyle(
+            name='Badge',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            textColor=self.PRIMARY_COLOR,
+            fontName='Helvetica-Bold',
+            spaceAfter=4
         ))
     
     def _download_file_from_storage(self, file_field):
-        """
-        Descarga un archivo desde el storage (local o Azure) y retorna una ruta temporal.
-        Funciona tanto con archivos locales como con Azure Storage.
-        
-        Args:
-            file_field: Campo de archivo de Django (ImageField, FileField, etc.)
-            
-        Returns:
-            tuple: (ruta_temporal, content_bytes) - la ruta y los bytes del archivo
-        """
+        """Descarga archivo desde storage (local o Azure)"""
         try:
-            # Si el archivo está vacío
             if not file_field or not file_field.name:
                 return None, None
             
             content = None
-
-            # Normalizar el nombre para evitar rutas absolutas (Windows/Linux)
             original_name = str(file_field.name)
             norm_name = original_name.replace('\\', '/').lstrip('/')
-
-            # Candidatos a probar con default_storage
-            candidates = []
-            candidates.append(norm_name)
-
-            # Si incluye unidad (p. ej. C:/...) o es absoluta, intentar recortar
+            
+            candidates = [norm_name]
+            
             if ':' in norm_name:
                 after_drive = norm_name.split(':', 1)[1].lstrip('/')
                 candidates.append(after_drive)
-
-            # Si contiene 'media/', probar desde ahí hacia delante
+            
             if 'media/' in norm_name:
                 after_media = norm_name.split('media/', 1)[1]
                 candidates.append(after_media)
-
-            # Fallback al nombre base
+            
             candidates.append(os.path.basename(norm_name))
-
-            # Intentar abrir con default_storage usando los candidatos
+            
             opened = False
             last_err = None
             for name in candidates:
@@ -115,331 +178,365 @@ class CVPDFGenerator:
                 except Exception as e:
                     last_err = e
                     continue
-
+            
             if not opened:
-                print(f"Error leyendo archivo desde storage: {last_err}")
                 return None, None
             
-            # Crear archivo temporal
             if content:
-                # Obtener extensión del archivo
                 _, ext = os.path.splitext(os.path.basename(norm_name))
                 temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=ext)
                 temp_path = temp_file.name
                 temp_file.write(content)
                 temp_file.close()
-                
-                # Guardar path temporal para limpieza posterior
                 self.temp_files.append(temp_path)
-                
                 return temp_path, content
         
         except Exception as e:
-            print(f"Error descargando archivo desde storage: {e}")
+            print(f"Error descargando archivo: {e}")
         
         return None, None
     
-    def _add_header(self):
-        """Añade encabezado con datos personales e imagen de perfil"""
-        # Crear tabla con imagen y datos de contacto
-        left_col = []
+    def _add_modern_header(self):
+        """Añade encabezado moderno con foto y datos de contacto"""
         
-        # Agregar imagen de perfil si existe
+        # Contenedores para las dos columnas
+        left_content = []
+        right_content = []
+        
+        # COLUMNA IZQUIERDA: Foto de perfil circular (si existe)
         if self.datos.fotoperfil:
             try:
-                # Descargar imagen desde storage (local o Azure)
                 temp_path, _ = self._download_file_from_storage(self.datos.fotoperfil)
-                
                 if temp_path and os.path.exists(temp_path):
                     try:
-                        img = Image(temp_path, width=1.2*inch, height=1.2*inch)
-                        left_col.append(img)
+                        # Imagen más grande y con mejor calidad
+                        img = Image(temp_path, width=1.8*inch, height=1.8*inch)
+                        left_content.append(img)
                     except Exception as e:
-                        print(f"Error creando imagen para PDF: {e}")
-            
+                        print(f"Error con imagen: {e}")
             except Exception as e:
-                print(f"Error cargando foto de perfil: {e}")
+                print(f"Error cargando foto: {e}")
         
-        # Derecha: Nombre y datos de contacto
-        right_col = []
-        
-        # Título con nombre completo
+        # COLUMNA DERECHA: Información principal
         nombre_completo = f"{self.datos.nombres} {self.datos.apellidos}".upper()
-        title = Paragraph(f"<b>{nombre_completo}</b>", self.styles['Title'])
-        right_col.append(title)
+        right_content.append(Paragraph(nombre_completo, self.styles['MainName']))
         
-        # Descripción del perfil
+        # Descripción profesional
         if self.datos.descripcionperfil:
-            descripcion = Paragraph(
-                f"<i>{self.datos.descripcionperfil}</i>",
-                self.styles['NormalText']
-            )
-            right_col.append(descripcion)
+            right_content.append(Paragraph(
+                self.datos.descripcionperfil,
+                self.styles['ProfessionalTitle']
+            ))
         
-        right_col.append(Spacer(1, 0.08*inch))
+        right_content.append(Spacer(1, 0.15*inch))
         
-        # Datos de contacto
-        contact_info = []
+        # Información de contacto en formato compacto y elegante
+        contact_items = []
+        
         if self.datos.telefonoconvencional:
-            contact_info.append(f"<b>Teléfono:</b> {self.datos.telefonoconvencional}")
-        if self.datos.telefonofijo:
-            contact_info.append(f"<b>Teléfono Fijo:</b> {self.datos.telefonofijo}")
+            contact_items.append(f"📱 {self.datos.telefonoconvencional}")
+        
         if self.user.email:
-            contact_info.append(f"<b>Email:</b> {self.user.email}")
+            contact_items.append(f"✉️ {self.user.email}")
+        
         if self.datos.sitioweb:
-            contact_info.append(f"<b>Sitio Web:</b> {self.datos.sitioweb}")
+            contact_items.append(f"🌐 {self.datos.sitioweb}")
         
-        for info in contact_info:
-            right_col.append(Paragraph(info, self.styles['Normal']))
+        if self.datos.ciudad:
+            contact_items.append(f"📍 {self.datos.ciudad}, {self.datos.pais or 'Ecuador'}")
         
-        # Crear tabla del encabezado
-        header_table = Table([[left_col, right_col]], colWidths=[1.5*inch, 5*inch])
+        for item in contact_items:
+            right_content.append(Paragraph(item, self.styles['ContactInfo']))
+        
+        # Crear tabla con las dos columnas
+        if left_content:
+            header_table = Table(
+                [[left_content, right_content]], 
+                colWidths=[2*inch, 4.5*inch]
+            )
+        else:
+            header_table = Table(
+                [[right_content]], 
+                colWidths=[6.5*inch]
+            )
+        
         header_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+            ('ALIGN', (1, 0), (1, 0), 'LEFT'),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
         ]))
         
         self.story.append(header_table)
-        self.story.append(Spacer(1, 0.2*inch))
+        
+        # Línea divisoria elegante
+        self.story.append(Spacer(1, 0.15*inch))
+        self.story.append(HRFlowable(
+            width="100%",
+            thickness=2,
+            color=self.PRIMARY_COLOR,
+            spaceBefore=5,
+            spaceAfter=15
+        ))
+    
+    def _add_section_title(self, title, icon="●"):
+        """Añade título de sección con diseño moderno"""
+        section_title = f"<b>{icon} {title.upper()}</b>"
+        self.story.append(Paragraph(section_title, self.styles['ModernSection']))
+        
+        # Línea debajo del título
+        self.story.append(HRFlowable(
+            width="20%",
+            thickness=3,
+            color=self.ACCENT_COLOR,
+            spaceBefore=2,
+            spaceAfter=12,
+            hAlign='LEFT'
+        ))
+    
+    def _add_experience_item(self, cargo, empresa, fecha_inicio, fecha_fin, descripcion):
+        """Añade un elemento de experiencia con diseño profesional"""
+        items = []
+        
+        # Cargo en negrita
+        items.append(Paragraph(f"<b>{cargo}</b>", self.styles['JobTitle']))
+        
+        # Empresa
+        if empresa:
+            items.append(Paragraph(empresa, self.styles['Company']))
+        
+        # Fechas
+        if fecha_inicio:
+            fecha_texto = f"{fecha_inicio.strftime('%b %Y') if fecha_inicio else ''}"
+            if fecha_fin:
+                fecha_texto += f" - {fecha_fin.strftime('%b %Y')}"
+            else:
+                fecha_texto += " - Presente"
+            items.append(Paragraph(fecha_texto, self.styles['DateStyle']))
+        
+        # Descripción
+        if descripcion:
+            items.append(Paragraph(descripcion, self.styles['Description']))
+        
+        items.append(Spacer(1, 0.12*inch))
+        
+        # Agregar todos los items como grupo
+        self.story.extend(items)
     
     def _add_datos_personales(self):
-        """Añade sección de datos personales"""
-        self.story.append(Paragraph("DATOS PERSONALES", self.styles['SectionTitle']))
+        """Añade datos personales si son relevantes"""
+        datos_relevantes = []
         
-        datos = [
-            ['Cédula de Identidad:', self.datos.numerocedula],
-            ['Sexo:', 'Hombre' if self.datos.sexo == 'H' else 'Mujer' if self.datos.sexo else 'No especificado'],
-            ['Fecha de Nacimiento:', str(self.datos.fechanacimiento) if self.datos.fechanacimiento else 'N/A'],
-            ['Nacionalidad:', self.datos.nacionalidad or 'N/A'],
-            ['Lugar de Nacimiento:', self.datos.lugarnacimiento or 'N/A'],
-            ['Estado Civil:', self.datos.estadocivil or 'N/A'],
-            ['Licencia de Conducir:', self.datos.licenciaconducir or 'N/A'],
-        ]
+        if self.datos.fechanacimiento:
+            edad = (datetime.now().date() - self.datos.fechanacimiento).days // 365
+            datos_relevantes.append(f"<b>Edad:</b> {edad} años")
         
-        direccion_data = []
-        if self.datos.direcciondomiciliaria:
-            direccion_data.append(['Dirección Domiciliaria:', self.datos.direcciondomiciliaria])
-        if self.datos.direcciontrabajo:
-            direccion_data.append(['Dirección de Trabajo:', self.datos.direcciontrabajo])
+        if self.datos.estadocivil:
+            datos_relevantes.append(f"<b>Estado Civil:</b> {self.datos.estadocivil}")
         
-        tabla_datos = Table(datos + direccion_data, colWidths=[2*inch, 4.5*inch])
-        tabla_datos.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
-            ('ROWBACKGROUNDS', (0, 0), (-1, -1), [colors.white, colors.HexColor('#f9f9f9')])
-        ]))
+        if self.datos.cedula:
+            datos_relevantes.append(f"<b>Cédula:</b> {self.datos.cedula}")
         
-        self.story.append(tabla_datos)
-        self.story.append(Spacer(1, 0.2*inch))
+        if datos_relevantes:
+            self._add_section_title("INFORMACIÓN PERSONAL", "👤")
+            
+            # Crear tabla de dos columnas para datos personales
+            table_data = []
+            for i in range(0, len(datos_relevantes), 2):
+                row = [datos_relevantes[i]]
+                if i + 1 < len(datos_relevantes):
+                    row.append(datos_relevantes[i + 1])
+                else:
+                    row.append("")
+                table_data.append(row)
+            
+            info_table = Table(table_data, colWidths=[3.25*inch, 3.25*inch])
+            info_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('TEXTCOLOR', (0, 0), (-1, -1), self.DARK_TEXT),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ]))
+            
+            self.story.append(info_table)
+            self.story.append(Spacer(1, 0.15*inch))
     
     def _add_experiencia_laboral(self):
-        """Añade sección de experiencia laboral"""
-        experiencias = self.datos.experiencias_laborales.filter(activo=True)
+        """Añade experiencia laboral con diseño moderno"""
+        experiencias = self.datos.experiencias_laborales.filter(activo=True).order_by('-fecha_inicio')
         
         if not experiencias.exists():
             return
         
-        self.story.append(Paragraph("EXPERIENCIA LABORAL", self.styles['SectionTitle']))
+        self._add_section_title("EXPERIENCIA PROFESIONAL", "💼")
         
         for exp in experiencias:
-            # Cargo y empresa
-            exp_title = f"<b>{exp.cargodesempenado}</b>"
-            if exp.nombreempresa:
-                exp_title += f" - {exp.nombreempresa}"
-            self.story.append(Paragraph(exp_title, self.styles['NormalText']))
-            
-            # Fechas y lugar
-            fecha_inicio = exp.fechainiciogestion.strftime('%b %Y') if exp.fechainiciogestion else ''
-            fecha_fin = exp.fechafingestion.strftime('%b %Y') if exp.fechafingestion else 'Presente'
-            periodos = f"<i>{fecha_inicio} - {fecha_fin}</i>"
-            if exp.lugarempresa:
-                periodos += f" | {exp.lugarempresa}"
-            self.story.append(Paragraph(periodos, self.styles['Normal']))
-            
-            # Descripción
-            if exp.descripcionfunciones:
-                self.story.append(Paragraph(
-                    exp.descripcionfunciones,
-                    self.styles['NormalText']
-                ))
-            
-            self.story.append(Spacer(1, 0.1*inch))
-        
-        self.story.append(Spacer(1, 0.1*inch))
+            self._add_experience_item(
+                cargo=exp.cargo,
+                empresa=exp.empresa,
+                fecha_inicio=exp.fecha_inicio,
+                fecha_fin=exp.fecha_fin,
+                descripcion=exp.descripcion
+            )
     
     def _add_reconocimientos(self):
-        """Añade sección de reconocimientos con imágenes de certificados"""
-        reconocimientos = self.datos.reconocimientos.filter(activo=True)
+        """Añade reconocimientos y logros"""
+        reconocimientos = self.datos.reconocimientos.filter(activo=True).order_by('-fecha')
         
         if not reconocimientos.exists():
             return
         
-        self.story.append(Paragraph("RECONOCIMIENTOS", self.styles['SectionTitle']))
+        self._add_section_title("RECONOCIMIENTOS Y LOGROS", "🏆")
         
-        for reco in reconocimientos:
-            # Tipo y entidad
-            titulo = f"<b>{reco.get_tiporeconocimiento_display()}</b> - {reco.entidadpatrocinadora}"
-            self.story.append(Paragraph(titulo, self.styles['NormalText']))
+        for rec in reconocimientos:
+            items = []
             
-            # Fecha
-            if reco.fechareconocimiento:
-                fecha = reco.fechareconocimiento.strftime('%d de %B de %Y')
-                self.story.append(Paragraph(f"<i>Fecha: {fecha}</i>", self.styles['Normal']))
+            titulo = f"<b>{rec.nombrereconocimiento}</b>"
+            if rec.otorgadopor:
+                titulo += f" - {rec.otorgadopor}"
             
-            # Descripción
-            if reco.descripcionreconocimiento:
-                self.story.append(Paragraph(
-                    reco.descripcionreconocimiento,
-                    self.styles['NormalText']
+            items.append(Paragraph(titulo, self.styles['JobTitle']))
+            
+            if rec.fecha:
+                items.append(Paragraph(
+                    rec.fecha.strftime('%B %Y'),
+                    self.styles['DateStyle']
                 ))
             
-            # Certificado
-            if reco.certificado:
-                cert_name = os.path.basename(reco.certificado.name)
-                
-                # Verificar que sea un PDF
-                if cert_name.lower().endswith('.pdf'):
-                    self.certificados_para_incrustar.append({
-                        'file_field': reco.certificado,
-                        'titulo': f"{reco.get_tiporeconocimiento_display()} - {reco.entidadpatrocinadora}"
-                    })
-                    self.story.append(Paragraph(
-                        f"<b>📎 Certificado:</b> {cert_name} (Incrustado abajo)",
-                        self.styles['Normal']
-                    ))
-                else:
-                    self.story.append(Paragraph(
-                        f"<b>📎 Certificado:</b> {cert_name}",
-                        self.styles['Normal']
-                    ))
+            if rec.descripcion:
+                items.append(Paragraph(rec.descripcion, self.styles['Description']))
             
-            self.story.append(Spacer(1, 0.15*inch))
-        
-        self.story.append(Spacer(1, 0.1*inch))
+            items.append(Spacer(1, 0.12*inch))
+            self.story.extend(items)
     
     def _add_cursos(self):
-        """Añade sección de cursos realizados con imágenes de certificados"""
-        cursos = self.datos.cursos_realizados.filter(activo=True)
+        """Añade cursos y certificaciones"""
+        cursos = self.datos.cursos_realizados.filter(activo=True).order_by('-fecha_inicio')
         
         if not cursos.exists():
             return
         
-        self.story.append(Paragraph("CURSOS Y CAPACITACIONES", self.styles['SectionTitle']))
+        self._add_section_title("FORMACIÓN Y CERTIFICACIONES", "📚")
         
         for curso in cursos:
+            items = []
+            
             # Nombre del curso
-            titulo = f"<b>{curso.nombrecurso}</b>"
-            self.story.append(Paragraph(titulo, self.styles['NormalText']))
+            items.append(Paragraph(f"<b>{curso.nombrecurso}</b>", self.styles['JobTitle']))
             
-            # Entidad y fechas
-            entidad = f"<i>{curso.entidadpatrocinadora}</i>"
-            if curso.fechainicio or curso.fechafin:
-                fecha_inicio = curso.fechainicio.strftime('%b %Y') if curso.fechainicio else ''
-                fecha_fin = curso.fechafin.strftime('%b %Y') if curso.fechafin else ''
-                fechas = f" | {fecha_inicio} - {fecha_fin}"
-                entidad += fechas
-            self.story.append(Paragraph(entidad, self.styles['Normal']))
+            # Institución
+            if curso.institucion:
+                items.append(Paragraph(curso.institucion, self.styles['Company']))
             
-            # Horas
+            # Fechas y horas
+            fecha_info = []
+            if curso.fecha_inicio:
+                fecha_texto = curso.fecha_inicio.strftime('%b %Y')
+                if curso.fecha_fin:
+                    fecha_texto += f" - {curso.fecha_fin.strftime('%b %Y')}"
+                fecha_info.append(fecha_texto)
+            
             if curso.totalhoras:
-                self.story.append(Paragraph(f"Horas: {curso.totalhoras}", self.styles['Normal']))
+                fecha_info.append(f"{curso.totalhoras} horas")
+            
+            if fecha_info:
+                items.append(Paragraph(
+                    " | ".join(fecha_info),
+                    self.styles['DateStyle']
+                ))
             
             # Descripción
             if curso.descripcioncurso:
-                self.story.append(Paragraph(
-                    curso.descripcioncurso,
-                    self.styles['NormalText']
-                ))
+                items.append(Paragraph(curso.descripcioncurso, self.styles['Description']))
             
             # Certificado
             if curso.certificado:
                 cert_name = os.path.basename(curso.certificado.name)
-                
-                # Verificar que sea un PDF
                 if cert_name.lower().endswith('.pdf'):
                     self.certificados_para_incrustar.append({
                         'file_field': curso.certificado,
-                        'titulo': f"Curso: {curso.nombrecurso}"
+                        'titulo': f"Certificado: {curso.nombrecurso}"
                     })
-                    self.story.append(Paragraph(
-                        f"<b>📎 Certificado:</b> {cert_name} (Incrustado abajo)",
-                        self.styles['Normal']
-                    ))
-                else:
-                    self.story.append(Paragraph(
-                        f"<b>📎 Certificado:</b> {cert_name}",
-                        self.styles['Normal']
+                    items.append(Paragraph(
+                        f"📎 Certificado adjunto",
+                        self.styles['Badge']
                     ))
             
-            self.story.append(Spacer(1, 0.15*inch))
-
-        
-        self.story.append(Spacer(1, 0.1*inch))
+            items.append(Spacer(1, 0.12*inch))
+            self.story.extend(items)
     
     def _add_productos_academicos(self):
-        """Añade sección de productos académicos"""
+        """Añade productos académicos"""
         productos = self.datos.productos_academicos.filter(activo=True)
         
         if not productos.exists():
             return
         
-        self.story.append(Paragraph("PRODUCTOS ACADÉMICOS", self.styles['SectionTitle']))
+        self._add_section_title("PRODUCCIÓN ACADÉMICA", "📖")
         
         for prod in productos:
-            titulo = f"<b>{prod.nombrerecurso}</b> ({prod.clasificador})"
-            self.story.append(Paragraph(titulo, self.styles['NormalText']))
+            items = []
+            
+            titulo = f"<b>{prod.nombrerecurso}</b>"
+            if prod.clasificador:
+                titulo += f" ({prod.clasificador})"
+            
+            items.append(Paragraph(titulo, self.styles['JobTitle']))
             
             if prod.descripcion:
-                self.story.append(Paragraph(prod.descripcion, self.styles['Normal']))
+                items.append(Paragraph(prod.descripcion, self.styles['Description']))
             
-            self.story.append(Spacer(1, 0.05*inch))
-        
-        self.story.append(Spacer(1, 0.1*inch))
+            items.append(Spacer(1, 0.12*inch))
+            self.story.extend(items)
     
     def _add_footer(self):
-        """Añade pie de página"""
-        self.story.append(Spacer(1, 0.15*inch))
-        fecha_generacion = datetime.now().strftime('%d de %B de %Y')
-        footer = Paragraph(
-            f"<i>Generado el: {fecha_generacion}</i>",
-            ParagraphStyle(
-                'Footer',
-                parent=self.styles['Normal'],
-                fontSize=8,
-                textColor=colors.grey,
-                alignment=TA_CENTER
-            )
+        """Añade pie de página profesional"""
+        self.story.append(Spacer(1, 0.3*inch))
+        
+        fecha = datetime.now().strftime('%d de %B de %Y')
+        footer_style = ParagraphStyle(
+            'ModernFooter',
+            parent=self.styles['Normal'],
+            fontSize=8,
+            textColor=self.LIGHT_TEXT,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Oblique'
         )
-        self.story.append(footer)
+        
+        self.story.append(HRFlowable(
+            width="100%",
+            thickness=0.5,
+            color=self.LIGHT_TEXT,
+            spaceBefore=10,
+            spaceAfter=10
+        ))
+        
+        self.story.append(Paragraph(
+            f"Curriculum Vitae generado el {fecha}",
+            footer_style
+        ))
     
     def generate(self):
-        """
-        Genera el PDF y lo retorna como BytesIO
-        Incluye certificados incrustados al final
-        
-        Returns:
-            BytesIO con el contenido del PDF
-        """
+        """Genera el PDF profesional"""
         try:
-            # Crear documento en memoria
             pdf_buffer = BytesIO()
             doc = SimpleDocTemplate(
                 pdf_buffer,
                 pagesize=letter,
                 rightMargin=0.75*inch,
                 leftMargin=0.75*inch,
-                topMargin=0.75*inch,
-                bottomMargin=0.75*inch
+                topMargin=0.6*inch,
+                bottomMargin=0.6*inch
             )
             
-            # Construir el documento con secciones dinámicas
-            self._add_header()
+            # Construir documento
+            self._add_modern_header()
             self._add_datos_personales()
             
-            # Solo agregar secciones que tengan datos
             if self.datos.experiencias_laborales.filter(activo=True).exists():
                 self._add_experiencia_laboral()
             
@@ -454,91 +551,57 @@ class CVPDFGenerator:
             
             self._add_footer()
             
-            # Generar el PDF principal
+            # Construir PDF
             doc.build(self.story)
             
-            # Si hay certificados, incrustarlos
+            # Incrustar certificados si existen
             if self.certificados_para_incrustar:
                 pdf_buffer.seek(0)
                 pdf_buffer = self._incrustar_certificados(pdf_buffer)
             
-            # Limpiar archivos temporales (imágenes descargadas de Azure)
-            if hasattr(self, 'temp_files'):
-                for temp_file in self.temp_files:
-                    try:
-                        if os.path.exists(temp_file):
-                            os.remove(temp_file)
-                    except:
-                        pass
+            # Limpiar archivos temporales
+            self._cleanup_temp_files()
             
-            # Retornar al inicio del buffer
             pdf_buffer.seek(0)
             return pdf_buffer
         
         except Exception as e:
             print(f"Error generando PDF: {e}")
-            # Limpiar temporales en caso de error
-            if hasattr(self, 'temp_files'):
-                for temp_file in self.temp_files:
-                    try:
-                        if os.path.exists(temp_file):
-                            os.remove(temp_file)
-                    except:
-                        pass
+            self._cleanup_temp_files()
             return None
     
     def _incrustar_certificados(self, pdf_principal_buffer):
-        """
-        Incrustra los PDFs de certificados al final del PDF principal.
-        Funciona automáticamente con archivos locales y Azure Storage.
-        """
+        """Incrusta certificados PDF al final"""
         try:
-            # Lector del PDF principal
             pdf_reader = PdfReader(pdf_principal_buffer)
             writer = PdfWriter()
             
-            # Copiar todas las páginas del PDF principal
             for page_num in range(len(pdf_reader.pages)):
                 writer.add_page(pdf_reader.pages[page_num])
             
-            # Agregar los certificados
             for cert_info in self.certificados_para_incrustar:
-                # Obtener el objeto del archivo (puede tener 'url' o 'path')
                 cert_field = cert_info.get('file_field')
-                cert_titulo = cert_info.get('titulo', 'Certificado')
                 
                 if not cert_field:
                     continue
                 
                 try:
-                    # Descargar el certificado desde storage (local o Azure)
                     temp_path, content = self._download_file_from_storage(cert_field)
                     
                     if not temp_path or not content:
-                        print(f"No se pudo descargar certificado: {cert_titulo}")
                         continue
                     
-                    # Leer el PDF descargado
-                    try:
-                        cert_buffer = BytesIO(content)
-                        cert_buffer.seek(0)
-                        cert_reader = PdfReader(cert_buffer)
-                        
-                        # Agregar todas las páginas del certificado
-                        for page_num in range(len(cert_reader.pages)):
-                            writer.add_page(cert_reader.pages[page_num])
-                        
-                        print(f"Certificado incrustado: {cert_titulo}")
+                    cert_buffer = BytesIO(content)
+                    cert_buffer.seek(0)
+                    cert_reader = PdfReader(cert_buffer)
                     
-                    except Exception as e:
-                        print(f"Error leyendo PDF de certificado: {e}")
-                        continue
+                    for page_num in range(len(cert_reader.pages)):
+                        writer.add_page(cert_reader.pages[page_num])
                 
                 except Exception as e:
-                    print(f"Error procesando certificado {cert_titulo}: {e}")
+                    print(f"Error con certificado: {e}")
                     continue
             
-            # Crear un nuevo buffer con el PDF combinado
             output_buffer = BytesIO()
             writer.write(output_buffer)
             
@@ -547,3 +610,13 @@ class CVPDFGenerator:
         except Exception as e:
             print(f"Error incrustando certificados: {e}")
             return pdf_principal_buffer
+    
+    def _cleanup_temp_files(self):
+        """Limpia archivos temporales"""
+        if hasattr(self, 'temp_files'):
+            for temp_file in self.temp_files:
+                try:
+                    if os.path.exists(temp_file):
+                        os.remove(temp_file)
+                except:
+                    pass
